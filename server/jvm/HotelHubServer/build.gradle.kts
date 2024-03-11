@@ -20,26 +20,26 @@ repositories {
 }
 
 dependencies {
-    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("jakarta.validation:jakarta.validation-api")
+    implementation("org.springframework.boot:spring-boot-starter-web:2.7.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
 
     // for JDBI
-    implementation("org.jdbi:jdbi3-core:3.37.1")
-    implementation("org.jdbi:jdbi3-kotlin:3.37.1")
-    implementation("org.jdbi:jdbi3-postgres:3.37.1")
-    implementation("org.postgresql:postgresql:42.7.0")
+    implementation("org.jdbi:jdbi3-core:3.38.0")
+    implementation("org.jdbi:jdbi3-kotlin:3.38.0")
+    implementation("org.jdbi:jdbi3-postgres:3.38.0")
+    implementation("org.postgresql:postgresql:42.3.1")
 
     // To use Kotlin specific date and time functions
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.0")
 
     // To get password encode
-    implementation("org.springframework.security:spring-security-core:6.0.2")
+    implementation("org.springframework.security:spring-security-core:6.0.3")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:2.7.0")
     // To use WebTestClient on tests
-    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux:2.7.0")
     testImplementation(kotlin("test"))
 }
 
