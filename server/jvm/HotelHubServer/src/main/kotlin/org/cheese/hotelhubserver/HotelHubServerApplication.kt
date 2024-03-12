@@ -1,8 +1,8 @@
 package org.cheese.hotelhubserver
 
 import kotlinx.datetime.Clock
-import org.cheese.hotelhubserver.domain.Sha256TokenEncoder
-import org.cheese.hotelhubserver.domain.UsersDomainConfig
+import org.cheese.hotelhubserver.domain.user.UserDomainConfig
+import org.cheese.hotelhubserver.domain.user.token.Sha256TokenEncoder
 import org.cheese.hotelhubserver.http.pipeline.AuthenticatedUserArgumentResolver
 import org.cheese.hotelhubserver.http.pipeline.AuthenticationInterceptor
 import org.cheese.hotelhubserver.repository.jdbi.configureWithAppRequirements
@@ -21,11 +21,12 @@ import kotlin.time.Duration.Companion.hours
 @SpringBootApplication
 class HotelHubServerApplication {
     @Bean
-    fun jdbi() = Jdbi.create(
-        PGSimpleDataSource().apply {
-            setURL(Environment.getDbUrl())
-        }
-    ).configureWithAppRequirements()
+    fun jdbi() =
+        Jdbi.create(
+            PGSimpleDataSource().apply {
+                setURL(Environment.getDbUrl())
+            },
+        ).configureWithAppRequirements()
 
     @Bean
     fun passwordEncoder() = BCryptPasswordEncoder()
@@ -37,20 +38,20 @@ class HotelHubServerApplication {
     fun clock() = Clock.System
 
     @Bean
-    fun usersDomainConfig() = UsersDomainConfig(
-        tokenSizeInBytes = 256 / 8,
-        tokenTtl = 24.hours,
-        tokenRollingTtl = 1.hours,
-        maxTokensPerUser = 3
-    )
+    fun userDomainConfig() =
+        UserDomainConfig(
+            tokenSizeInBytes = 256 / 8,
+            tokenTtl = 24.hours,
+            tokenRollingTtl = 1.hours,
+            maxTokensPerUser = 3,
+        )
 }
 
 @Configuration
 class PipelineConfigurer(
     val authenticationInterceptor: AuthenticationInterceptor,
-    val authenticatedUserArgumentResolver: AuthenticatedUserArgumentResolver
+    val authenticatedUserArgumentResolver: AuthenticatedUserArgumentResolver,
 ) : WebMvcConfigurer {
-
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(authenticationInterceptor)
     }

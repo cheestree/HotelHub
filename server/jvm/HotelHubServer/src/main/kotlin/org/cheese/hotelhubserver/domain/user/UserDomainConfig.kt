@@ -1,12 +1,12 @@
-package org.cheese.hotelhubserver.domain
+package org.cheese.hotelhubserver.domain.user
 
 import kotlin.time.Duration
 
-data class UsersDomainConfig(
+data class UserDomainConfig(
     val tokenSizeInBytes: Int,
     val tokenTtl: Duration,
     val tokenRollingTtl: Duration,
-    val maxTokensPerUser: Int
+    val maxTokensPerUser: Int,
 ) {
     init {
         require(tokenSizeInBytes > 0)

@@ -2,9 +2,9 @@ package org.cheese.hotelhubserver.services
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import org.cheese.hotelhubserver.domain.Token
-import org.cheese.hotelhubserver.domain.User
-import org.cheese.hotelhubserver.domain.UserDomain
+import org.cheese.hotelhubserver.domain.user.User
+import org.cheese.hotelhubserver.domain.user.UserDomain
+import org.cheese.hotelhubserver.domain.user.token.Token
 import org.cheese.hotelhubserver.repository.TransactionManager
 import org.cheese.hotelhubserver.util.Either
 import org.cheese.hotelhubserver.util.failure
@@ -13,11 +13,12 @@ import org.springframework.stereotype.Component
 
 data class TokenExternalInfo(
     val tokenValue: String,
-    val tokenExpiration: Instant
+    val tokenExpiration: Instant,
 )
 
 sealed class UserCreationError {
     object UserAlreadyExists : UserCreationError()
+
     object InsecurePassword : UserCreationError()
 }
 typealias UserCreationResult = Either<UserCreationError, Int>
@@ -30,16 +31,19 @@ typealias TokenCreationResult = Either<TokenCreationError, TokenExternalInfo>
 @Component
 class UserServices(
     private val transactionManager: TransactionManager,
-    private val usersDomain: UserDomain,
-    private val clock: Clock
+    private val userDomain: UserDomain,
+    private val clock: Clock,
 ) {
-
-    fun createUser(username: String, email: String, password: String): UserCreationResult {
-        if (!usersDomain.isSafePassword(password)) {
+    fun createUser(
+        username: String,
+        email: String,
+        password: String,
+    ): UserCreationResult {
+        if (!userDomain.isSafePassword(password)) {
             return failure(UserCreationError.InsecurePassword)
         }
 
-        val passwordValidationInfo = usersDomain.createPasswordValidationInformation(password)
+        val passwordValidationInfo = userDomain.createPasswordValidationInformation(password)
 
         return transactionManager.run {
             val usersRepository = it.userRepository
@@ -52,46 +56,51 @@ class UserServices(
         }
     }
 
-    fun createToken(username: String, password: String): TokenCreationResult {
+    fun createToken(
+        username: String,
+        password: String,
+    ): TokenCreationResult {
         if (username.isBlank() || password.isBlank()) {
             failure(TokenCreationError.UserOrPasswordAreInvalid)
         }
         return transactionManager.run {
             val usersRepository = it.userRepository
-            val user: User = usersRepository.getUserByUsername(username)
-                ?: return@run failure(TokenCreationError.UserOrPasswordAreInvalid)
-            if (!usersDomain.validatePassword(password, user.passwordValidation)) {
-                if (!usersDomain.validatePassword(password, user.passwordValidation)) {
+            val user: User =
+                usersRepository.getUserByUsername(username)
+                    ?: return@run failure(TokenCreationError.UserOrPasswordAreInvalid)
+            if (!userDomain.validatePassword(password, user.passwordValidation)) {
+                if (!userDomain.validatePassword(password, user.passwordValidation)) {
                     return@run failure(TokenCreationError.UserOrPasswordAreInvalid)
                 }
             }
-            val tokenValue = usersDomain.generateTokenValue()
+            val tokenValue = userDomain.generateTokenValue()
             val now = clock.now()
-            val newToken = Token(
-                usersDomain.createTokenValidationInformation(tokenValue),
-                user.id,
-                createdAt = now,
-                lastUsedAt = now
-            )
-            usersRepository.createToken(newToken, usersDomain.maxNumberOfTokensPerUser)
+            val newToken =
+                Token(
+                    userDomain.createTokenValidationInformation(tokenValue),
+                    user.id,
+                    createdAt = now,
+                    lastUsedAt = now,
+                )
+            usersRepository.createToken(newToken, userDomain.maxNumberOfTokensPerUser)
             Either.Right(
                 TokenExternalInfo(
                     tokenValue,
-                    usersDomain.getTokenExpiration(newToken)
-                )
+                    userDomain.getTokenExpiration(newToken),
+                ),
             )
         }
     }
 
     fun getUserByToken(token: String): User? {
-        if (!usersDomain.canBeToken(token)) {
+        if (!userDomain.canBeToken(token)) {
             return null
         }
         return transactionManager.run {
             val usersRepository = it.userRepository
-            val tokenValidationInfo = usersDomain.createTokenValidationInformation(token)
+            val tokenValidationInfo = userDomain.createTokenValidationInformation(token)
             val userAndToken = usersRepository.getTokenByTokenValidationInfo(tokenValidationInfo)
-            if (userAndToken != null && usersDomain.isTokenTimeValid(clock, userAndToken.second)) {
+            if (userAndToken != null && userDomain.isTokenTimeValid(clock, userAndToken.second)) {
                 usersRepository.updateTokenLastUsed(userAndToken.second, clock.now())
                 userAndToken.first
             } else {
@@ -101,7 +110,7 @@ class UserServices(
     }
 
     fun revokeToken(token: String): Boolean {
-        val tokenValidationInfo = usersDomain.createTokenValidationInformation(token)
+        val tokenValidationInfo = userDomain.createTokenValidationInformation(token)
         return transactionManager.run {
             it.userRepository.removeTokenByValidationInfo(tokenValidationInfo)
             true

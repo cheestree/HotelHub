@@ -5,7 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.4"
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.spring") version "1.9.22"
-    id("org.jlleitschuh.gradle.ktlint") version "11.6.0"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
 }
 
 group = "org.example"
@@ -20,6 +20,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("org.springframework.boot:spring-boot-starter-web:2.7.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
@@ -29,7 +30,7 @@ dependencies {
     implementation("org.jdbi:jdbi3-core:3.38.0")
     implementation("org.jdbi:jdbi3-kotlin:3.38.0")
     implementation("org.jdbi:jdbi3-postgres:3.38.0")
-    implementation("org.postgresql:postgresql:42.3.1")
+    implementation("org.postgresql:postgresql:42.7.0")
 
     // To use Kotlin specific date and time functions
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.0")

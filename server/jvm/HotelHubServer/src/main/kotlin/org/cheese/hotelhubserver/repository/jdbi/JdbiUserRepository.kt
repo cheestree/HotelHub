@@ -1,29 +1,33 @@
 package org.cheese.hotelhubserver.repository.jdbi
 
 import kotlinx.datetime.Instant
-import org.cheese.hotelhubserver.domain.PasswordValidationInfo
-import org.cheese.hotelhubserver.domain.Token
-import org.cheese.hotelhubserver.domain.TokenValidationInfo
-import org.cheese.hotelhubserver.domain.User
+import org.cheese.hotelhubserver.domain.user.PasswordValidationInfo
+import org.cheese.hotelhubserver.domain.user.User
+import org.cheese.hotelhubserver.domain.user.token.Token
+import org.cheese.hotelhubserver.domain.user.token.TokenValidationInfo
+import org.cheese.hotelhubserver.repository.UserRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.LoggerFactory
 
 class JdbiUserRepository(
-    private val handle: Handle
+    private val handle: Handle,
 ) : UserRepository {
-
     override fun getUserByUsername(username: String): User? =
         handle.createQuery("select * from hotelhub.user where username = :username")
             .bind("username", username)
             .mapTo<User>()
             .singleOrNull()
 
-    override fun storeUser(username: String, email: String, passwordValidation: PasswordValidationInfo): Int =
+    override fun storeUser(
+        username: String,
+        email: String,
+        passwordValidation: PasswordValidationInfo,
+    ): Int =
         handle.createUpdate(
             """
             insert into hotelhub.user (username, email, password_validation) values (:username, :email, :password_validation)
-            """
+            """,
         )
             .bind("username", username)
             .bind("email", email)
@@ -38,28 +42,32 @@ class JdbiUserRepository(
             .mapTo<Int>()
             .single() == 1
 
-    override fun createToken(token: Token, maxTokens: Int) {
-        val deletions = handle.createUpdate(
-            """
-            delete from hotelhub.token 
-            where user_id = :user_id 
-                and token_validation in (
-                    select token_validation from hotelhub.token where user_id = :user_id 
-                        order by last_used_at desc offset :offset
-                )
-            """.trimIndent()
-        )
-            .bind("user_id", token.userId)
-            .bind("offset", maxTokens - 1)
-            .execute()
+    override fun createToken(
+        token: Token,
+        maxTokens: Int,
+    ) {
+        val deletions =
+            handle.createUpdate(
+                """
+                delete from hotelhub.token 
+                where user_id = :user_id 
+                    and token_validation in (
+                        select token_validation from hotelhub.token where user_id = :user_id 
+                            order by last_used_at desc offset :offset
+                    )
+                """.trimIndent(),
+            )
+                .bind("user_id", token.userId)
+                .bind("offset", maxTokens - 1)
+                .execute()
 
         logger.info("{} tokens deleted when creating new token", deletions)
 
         handle.createUpdate(
             """
-                insert into hotelhub.token(user_id, token_validation, created_at, last_used_at) 
-                values (:user_id, :token_validation, :created_at, :last_used_at)
-            """.trimIndent()
+            insert into hotelhub.token(user_id, token_validation, created_at, last_used_at) 
+            values (:user_id, :token_validation, :created_at, :last_used_at)
+            """.trimIndent(),
         )
             .bind("user_id", token.userId)
             .bind("token_validation", token.tokenValidationInfo.validationInfo)
@@ -68,13 +76,16 @@ class JdbiUserRepository(
             .execute()
     }
 
-    override fun updateTokenLastUsed(token: Token, now: Instant) {
+    override fun updateTokenLastUsed(
+        token: Token,
+        now: Instant,
+    ) {
         handle.createUpdate(
             """
-                update hotelhub.token
-                set last_used_at = :last_used_at
-                where token_validation = :validation_information
-            """.trimIndent()
+            update hotelhub.token
+            set last_used_at = :last_used_at
+            where token_validation = :validation_information
+            """.trimIndent(),
         )
             .bind("last_used_at", now.epochSeconds)
             .bind("validation_information", token.tokenValidationInfo.validationInfo)
@@ -89,7 +100,7 @@ class JdbiUserRepository(
                 inner join hotelhub.token as tokens 
                 on users.id = tokens.user_id
                 where token_validation = :validation_information
-            """
+            """,
         )
             .bind("validation_information", tokenValidationInfo.validationInfo)
             .mapTo<UserAndTokenModel>()
@@ -101,7 +112,7 @@ class JdbiUserRepository(
             """
                 delete from hotelhub.token
                 where token_validation = :validation_information
-            """
+            """,
         )
             .bind("validation_information", tokenValidationInfo.validationInfo)
             .execute()
@@ -113,18 +124,19 @@ class JdbiUserRepository(
         val passwordValidation: PasswordValidationInfo,
         val tokenValidation: TokenValidationInfo,
         val createdAt: Long,
-        val lastUsedAt: Long
+        val lastUsedAt: Long,
     ) {
         val userAndToken: Pair<User, Token>
-            get() = Pair(
-                User(id, username, passwordValidation),
-                Token(
-                    tokenValidation,
-                    id,
-                    Instant.fromEpochSeconds(createdAt),
-                    Instant.fromEpochSeconds(lastUsedAt)
+            get() =
+                Pair(
+                    User(id, username, passwordValidation),
+                    Token(
+                        tokenValidation,
+                        id,
+                        Instant.fromEpochSeconds(createdAt),
+                        Instant.fromEpochSeconds(lastUsedAt),
+                    ),
                 )
-            )
     }
 
     companion object {

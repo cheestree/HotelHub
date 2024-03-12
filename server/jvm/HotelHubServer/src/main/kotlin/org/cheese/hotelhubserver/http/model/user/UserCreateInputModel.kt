@@ -13,12 +13,10 @@ data class UserCreateInputModel(
     @Min(value = USERNAME_MIN_LENGTH)
     @Max(value = USERNAME_MAX_LENGTH)
     val username: String,
-
     @NotEmpty
     @Email
     val email: String,
-
     @NotEmpty
     @Min(value = 6)
-    val password: String
+    val password: String,
 )

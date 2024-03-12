@@ -1,14 +1,13 @@
 package org.cheese.hotelhubserver.http.pipeline
 
-import org.cheese.hotelhubserver.domain.AuthenticatedUser
+import org.cheese.hotelhubserver.domain.user.AuthenticatedUser
 import org.cheese.hotelhubserver.services.UserServices
 import org.springframework.stereotype.Component
 
 @Component
 class RequestTokenProcessor(
-    val usersService: UserServices
+    val usersService: UserServices,
 ) {
-
     fun processAuthorizationHeaderValue(authorizationValue: String?): AuthenticatedUser? {
         if (authorizationValue == null) {
             return null
@@ -23,7 +22,7 @@ class RequestTokenProcessor(
         return usersService.getUserByToken(parts[1])?.let {
             AuthenticatedUser(
                 it,
-                parts[1]
+                parts[1],
             )
         }
     }

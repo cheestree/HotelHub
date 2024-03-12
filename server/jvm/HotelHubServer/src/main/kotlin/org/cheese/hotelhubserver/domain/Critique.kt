@@ -1,4 +1,3 @@
 package org.cheese.hotelhubserver.domain
 
-class Critique {
-}
+class Critique
