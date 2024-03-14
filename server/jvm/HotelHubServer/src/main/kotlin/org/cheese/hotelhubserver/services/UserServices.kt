@@ -30,7 +30,7 @@ typealias TokenCreationResult = Either<TokenCreationError, TokenExternalInfo>
 
 @Component
 class UserServices(
-    private val transactionManager: TransactionManager,
+    private val tm: TransactionManager,
     private val userDomain: UserDomain,
     private val clock: Clock,
 ) {
@@ -45,7 +45,7 @@ class UserServices(
 
         val passwordValidationInfo = userDomain.createPasswordValidationInformation(password)
 
-        return transactionManager.run {
+        return tm.run {
             val usersRepository = it.userRepository
             if (usersRepository.isUserStoredByUsername(username)) {
                 failure(UserCreationError.UserAlreadyExists)
@@ -63,7 +63,7 @@ class UserServices(
         if (username.isBlank() || password.isBlank()) {
             failure(TokenCreationError.UserOrPasswordAreInvalid)
         }
-        return transactionManager.run {
+        return tm.run {
             val usersRepository = it.userRepository
             val user: User =
                 usersRepository.getUserByUsername(username)
@@ -96,7 +96,7 @@ class UserServices(
         if (!userDomain.canBeToken(token)) {
             return null
         }
-        return transactionManager.run {
+        return tm.run {
             val usersRepository = it.userRepository
             val tokenValidationInfo = userDomain.createTokenValidationInformation(token)
             val userAndToken = usersRepository.getTokenByTokenValidationInfo(tokenValidationInfo)
@@ -111,7 +111,7 @@ class UserServices(
 
     fun revokeToken(token: String): Boolean {
         val tokenValidationInfo = userDomain.createTokenValidationInformation(token)
-        return transactionManager.run {
+        return tm.run {
             it.userRepository.removeTokenByValidationInfo(tokenValidationInfo)
             true
         }

@@ -1,5 +1,6 @@
 package org.cheese.hotelhubserver.repository.jdbi
 
+import org.cheese.hotelhubserver.domain.Feature
 import org.cheese.hotelhubserver.domain.Hotel
 import org.cheese.hotelhubserver.repository.HotelRepository
 import org.jdbi.v3.core.Handle
@@ -31,6 +32,10 @@ class JdbiHotelRepository(
             .bind("id", id)
             .mapTo<Hotel>()
             .singleOrNull()
+    }
+
+    override fun getHotels(stars: Int?, features: List<Feature>?): List<Hotel> {
+        TODO("Not yet implemented")
     }
 
 }

@@ -3,6 +3,7 @@ package org.cheese.hotelhubserver.http.controller
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotEmpty
+import org.cheese.hotelhubserver.domain.Feature
 import org.cheese.hotelhubserver.http.Uris
 import org.cheese.hotelhubserver.http.model.hotel.HotelCreateInputModel
 import org.cheese.hotelhubserver.http.model.user.Problem
@@ -35,12 +36,14 @@ class HotelController(
         }
     }
 
-    /*
     @GetMapping(Uris.Hotel.GETHOTELS)
-    fun getHotels(): ResponseEntity<*> {
-
+    fun getHotels(
+        @Valid @RequestParam stars: Int?,
+        @Valid @RequestParam features: List<Feature>?,
+    ): ResponseEntity<*> {
+        val res = hotelServices.getHotels(stars, features)
+        return ResponseEntity.status(200).body(res)
     }
-    */
 
     @GetMapping(Uris.Hotel.GETHOTEL)
     fun getHotel(

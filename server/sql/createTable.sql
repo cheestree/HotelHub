@@ -31,6 +31,13 @@ create table hotelhub.hotel
     longitude double precision                  not null
 );
 
+create table hotelhub.features
+(
+    id int not null,
+    feature varchar(32) not null,
+    foreign key (id) references hotelhub.hotel (id)
+);
+
 create table hotelhub.critique
 (
     id          serial primary key,
