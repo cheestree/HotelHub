@@ -6,12 +6,8 @@ import jakarta.validation.constraints.NotEmpty
 import org.cheese.hotelhubserver.domain.Feature
 import org.cheese.hotelhubserver.http.Uris
 import org.cheese.hotelhubserver.http.model.hotel.HotelCreateInputModel
-import org.cheese.hotelhubserver.http.model.user.Problem
-import org.cheese.hotelhubserver.services.HotelCreationError
-import org.cheese.hotelhubserver.services.HotelFetchError
 import org.cheese.hotelhubserver.services.HotelServices
-import org.cheese.hotelhubserver.util.Failure
-import org.cheese.hotelhubserver.util.Success
+import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -26,14 +22,7 @@ class HotelController(
         @Valid @RequestBody input: HotelCreateInputModel,
     ): ResponseEntity<*> {
         val res = hotelServices.createHotel(input.name, input.address, input.stars, input.latitude, input.longitude)
-        return when (res) {
-            is Success -> ResponseEntity.status(201).body(res)
-            is Failure ->
-                when (res.value) {
-                    HotelCreationError.HotelAlreadyExists ->
-                        Problem.response(400, Problem.alreadyExists)
-                }
-        }
+        return ResponseEntity.status(CREATED).body(res)
     }
 
     @GetMapping(Uris.Hotel.GETHOTELS)
@@ -42,20 +31,14 @@ class HotelController(
         @Valid @RequestParam features: List<Feature>?,
     ): ResponseEntity<*> {
         val res = hotelServices.getHotels(stars, features)
-        return ResponseEntity.status(200).body(res)
+        return ResponseEntity.ok().body(res)
     }
 
     @GetMapping(Uris.Hotel.GETHOTEL)
     fun getHotel(
-        @Valid @NotEmpty @Min(value = 1, message = "Must be at least 1") @PathVariable id: Int
+        @Valid @Min(value = 1, message = "Must be at least 1") @PathVariable hotelId: Int
     ): ResponseEntity<*> {
-        val res = hotelServices.getHotel(id)
-        return when (res) {
-            is Success -> ResponseEntity.status(201).body(res)
-            is Failure ->
-                when (res.value) {
-                    HotelFetchError.HotelDoesntExist -> Problem.response(404, Problem.doesntExist)
-                }
-        }
+        val res = hotelServices.getHotel(hotelId)
+        return ResponseEntity.ok().body(res)
     }
 }

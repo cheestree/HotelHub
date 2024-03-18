@@ -13,11 +13,20 @@ import org.slf4j.LoggerFactory
 class JdbiUserRepository(
     private val handle: Handle,
 ) : UserRepository {
-    override fun getUserByUsername(username: String): User? =
-        handle.createQuery("select * from hotelhub.user where username = :username")
+    override fun getUserByUsername(username: String): User =
+        handle.createQuery("""select * from hotelhub.user where username = :username""")
             .bind("username", username)
             .mapTo<User>()
-            .singleOrNull()
+            .single()
+
+    override fun getUserById(user: Int): Boolean {
+        return handle.createQuery("""
+            select * from hotelhub.user where id = :user
+        """)
+            .bind("user", user)
+            .mapTo<User>()
+            .singleOrNull() != null
+    }
 
     override fun storeUser(
         username: String,
@@ -37,7 +46,7 @@ class JdbiUserRepository(
             .one()
 
     override fun isUserStoredByUsername(username: String): Boolean =
-        handle.createQuery("select count(*) from hotelhub.user where username = :username")
+        handle.createQuery("""select count(*) from hotelhub.user where username = :username""")
             .bind("username", username)
             .mapTo<Int>()
             .single() == 1
@@ -55,7 +64,7 @@ class JdbiUserRepository(
                         select token_validation from hotelhub.token where user_id = :user_id 
                             order by last_used_at desc offset :offset
                     )
-                """.trimIndent(),
+                """,
             )
                 .bind("user_id", token.userId)
                 .bind("offset", maxTokens - 1)
@@ -67,7 +76,7 @@ class JdbiUserRepository(
             """
             insert into hotelhub.token(user_id, token_validation, created_at, last_used_at) 
             values (:user_id, :token_validation, :created_at, :last_used_at)
-            """.trimIndent(),
+            """,
         )
             .bind("user_id", token.userId)
             .bind("token_validation", token.tokenValidationInfo.validationInfo)
@@ -82,10 +91,10 @@ class JdbiUserRepository(
     ) {
         handle.createUpdate(
             """
-            update hotelhub.token
-            set last_used_at = :last_used_at
+            update hotelhub.token 
+            set last_used_at = :last_used_at 
             where token_validation = :validation_information
-            """.trimIndent(),
+            """,
         )
             .bind("last_used_at", now.epochSeconds)
             .bind("validation_information", token.tokenValidationInfo.validationInfo)
@@ -95,7 +104,7 @@ class JdbiUserRepository(
     override fun getTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>? =
         handle.createQuery(
             """
-                select id, username, password_validation, token_validation, created_at, last_used_at
+                select id, username, password_validation, token_validation, created_at, last_used_at 
                 from hotelhub.user as users 
                 inner join hotelhub.token as tokens 
                 on users.id = tokens.user_id

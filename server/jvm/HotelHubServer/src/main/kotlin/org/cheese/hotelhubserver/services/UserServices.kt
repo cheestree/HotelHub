@@ -1,107 +1,77 @@
 package org.cheese.hotelhubserver.services
 
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import org.cheese.hotelhubserver.domain.exceptions.UserExceptions.*
 import org.cheese.hotelhubserver.domain.user.User
 import org.cheese.hotelhubserver.domain.user.UserDomain
 import org.cheese.hotelhubserver.domain.user.token.Token
+import org.cheese.hotelhubserver.domain.user.token.TokenExternalInfo
 import org.cheese.hotelhubserver.repository.TransactionManager
-import org.cheese.hotelhubserver.util.Either
-import org.cheese.hotelhubserver.util.failure
-import org.cheese.hotelhubserver.util.success
+import org.cheese.hotelhubserver.util.requireOrThrow
 import org.springframework.stereotype.Component
-
-data class TokenExternalInfo(
-    val tokenValue: String,
-    val tokenExpiration: Instant,
-)
-
-sealed class UserCreationError {
-    object UserAlreadyExists : UserCreationError()
-
-    object InsecurePassword : UserCreationError()
-}
-typealias UserCreationResult = Either<UserCreationError, Int>
-
-sealed class TokenCreationError {
-    object UserOrPasswordAreInvalid : TokenCreationError()
-}
-typealias TokenCreationResult = Either<TokenCreationError, TokenExternalInfo>
 
 @Component
 class UserServices(
     private val tm: TransactionManager,
-    private val userDomain: UserDomain,
+    private val domain: UserDomain,
     private val clock: Clock,
 ) {
     fun createUser(
         username: String,
         email: String,
         password: String,
-    ): UserCreationResult {
-        if (!userDomain.isSafePassword(password)) {
-            return failure(UserCreationError.InsecurePassword)
-        }
+    ): Int {
+        requireOrThrow<InsecurePassword>(domain.isSafePassword(password)) { "Insecure password" }
 
-        val passwordValidationInfo = userDomain.createPasswordValidationInformation(password)
+        val passwordValidationInfo = domain.createPasswordValidationInformation(password)
 
         return tm.run {
             val usersRepository = it.userRepository
-            if (usersRepository.isUserStoredByUsername(username)) {
-                failure(UserCreationError.UserAlreadyExists)
-            } else {
-                val id = usersRepository.storeUser(username, email, passwordValidationInfo)
-                success(id)
-            }
+            requireOrThrow<UserAlreadyExists>(usersRepository.isUserStoredByUsername(username)) { "User already exists" }
+            usersRepository.storeUser(username, email, passwordValidationInfo)
         }
     }
 
-    fun createToken(
+    fun login(
         username: String,
-        password: String,
-    ): TokenCreationResult {
-        if (username.isBlank() || password.isBlank()) {
-            failure(TokenCreationError.UserOrPasswordAreInvalid)
+        password: String
+    ): TokenExternalInfo = tm.run {
+        requireOrThrow<UserOrPasswordAreInvalid>(it.userRepository.isUserStoredByUsername(username)) {
+            "Incorrect username or password"
         }
-        return tm.run {
-            val usersRepository = it.userRepository
-            val user: User =
-                usersRepository.getUserByUsername(username)
-                    ?: return@run failure(TokenCreationError.UserOrPasswordAreInvalid)
-            if (!userDomain.validatePassword(password, user.passwordValidation)) {
-                if (!userDomain.validatePassword(password, user.passwordValidation)) {
-                    return@run failure(TokenCreationError.UserOrPasswordAreInvalid)
-                }
-            }
-            val tokenValue = userDomain.generateTokenValue()
-            val now = clock.now()
-            val newToken =
-                Token(
-                    userDomain.createTokenValidationInformation(tokenValue),
-                    user.id,
-                    createdAt = now,
-                    lastUsedAt = now,
-                )
-            usersRepository.createToken(newToken, userDomain.maxNumberOfTokensPerUser)
-            Either.Right(
-                TokenExternalInfo(
-                    tokenValue,
-                    userDomain.getTokenExpiration(newToken),
-                ),
-            )
+        val user = it.userRepository.getUserByUsername(username)
+        requireOrThrow<UserOrPasswordAreInvalid>(domain.validatePassword(password, user.passwordValidation)) {
+            "Incorrect username or password"
         }
+        createToken(user.id)
+    }
+
+    private fun createToken(userId: Int): TokenExternalInfo {
+        val tokenValue = domain.generateTokenValue()
+        val now = clock.now()
+        val token = Token(
+            tokenValidationInfo = domain.createTokenValidationInformation(tokenValue),
+            userId = userId,
+            createdAt = now,
+            lastUsedAt = now
+        )
+        tm.run {
+            requireOrThrow<UserNotFound>(it.userRepository.getUserById(userId)) { "User was not found" }
+            it.userRepository.createToken(token, 1)
+        }
+        return TokenExternalInfo(
+            tokenValue = tokenValue,
+            tokenExpiration = domain.getTokenExpiration(token)
+        )
     }
 
     fun getUserByToken(token: String): User? {
-        if (!userDomain.canBeToken(token)) {
-            return null
-        }
+        if (!domain.canBeToken(token)) return null
         return tm.run {
-            val usersRepository = it.userRepository
-            val tokenValidationInfo = userDomain.createTokenValidationInformation(token)
-            val userAndToken = usersRepository.getTokenByTokenValidationInfo(tokenValidationInfo)
-            if (userAndToken != null && userDomain.isTokenTimeValid(clock, userAndToken.second)) {
-                usersRepository.updateTokenLastUsed(userAndToken.second, clock.now())
+            val tokenValidationInfo = domain.createTokenValidationInformation(token)
+            val userAndToken = it.userRepository.getTokenByTokenValidationInfo(tokenValidationInfo)
+            if (userAndToken != null && domain.isTokenTimeValid(clock, userAndToken.second)) {
+                it.userRepository.updateTokenLastUsed(userAndToken.second, clock.now())
                 userAndToken.first
             } else {
                 null
@@ -110,7 +80,7 @@ class UserServices(
     }
 
     fun revokeToken(token: String): Boolean {
-        val tokenValidationInfo = userDomain.createTokenValidationInformation(token)
+        val tokenValidationInfo = domain.createTokenValidationInformation(token)
         return tm.run {
             it.userRepository.removeTokenByValidationInfo(tokenValidationInfo)
             true

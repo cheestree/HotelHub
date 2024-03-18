@@ -23,19 +23,26 @@ class JdbiHotelRepository(
             .execute() == 1
     }
 
-    override fun getHotel(id: Int): Hotel? {
-        return handle.createQuery(
-            """
-                select * from hotelhub.hotel where id == id
-            """
-        )
+    override fun getHotel(id: Int): Hotel {
+        return handle.createQuery("""select * from hotelhub.hotel where id = :id""")
             .bind("id", id)
             .mapTo<Hotel>()
-            .singleOrNull()
+            .single()
     }
 
     override fun getHotels(stars: Int?, features: List<Feature>?): List<Hotel> {
         TODO("Not yet implemented")
+    }
+
+    override fun hotelExists(id: Int): Boolean {
+        return handle.createQuery(
+            """
+                select * from hotelhub.hotel where id = :id
+            """
+        )
+            .bind("id", id)
+            .mapTo<Hotel>()
+            .singleOrNull() != null
     }
 
 }

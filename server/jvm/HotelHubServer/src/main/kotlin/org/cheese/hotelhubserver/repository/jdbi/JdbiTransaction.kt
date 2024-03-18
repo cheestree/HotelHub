@@ -1,5 +1,6 @@
 package org.cheese.hotelhubserver.repository.jdbi
 
+import org.cheese.hotelhubserver.repository.CritiqueRepository
 import org.cheese.hotelhubserver.repository.HotelRepository
 import org.cheese.hotelhubserver.repository.Transaction
 import org.cheese.hotelhubserver.repository.UserRepository
@@ -10,6 +11,7 @@ class JdbiTransaction(
 ) : Transaction {
     override val userRepository: UserRepository = JdbiUserRepository(handle)
     override val hotelRepository: HotelRepository = JdbiHotelRepository(handle)
+    override val critiqueRepository: CritiqueRepository = JdbiCritiqueRepository(handle)
 
     override fun rollback() {
         handle.rollback()

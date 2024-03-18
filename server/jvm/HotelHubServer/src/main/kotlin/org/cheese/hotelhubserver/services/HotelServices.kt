@@ -3,27 +3,16 @@ package org.cheese.hotelhubserver.services
 import kotlinx.datetime.Clock
 import org.cheese.hotelhubserver.domain.Feature
 import org.cheese.hotelhubserver.domain.Hotel
+import org.cheese.hotelhubserver.domain.exceptions.HotelExceptions.HotelDoesntExist
 import org.cheese.hotelhubserver.domain.user.UserDomain
 import org.cheese.hotelhubserver.repository.TransactionManager
-import org.cheese.hotelhubserver.util.Either
-import org.cheese.hotelhubserver.util.failure
-import org.cheese.hotelhubserver.util.success
+import org.cheese.hotelhubserver.util.requireOrThrow
 import org.springframework.stereotype.Component
-
-sealed class HotelFetchError {
-    object HotelDoesntExist : HotelFetchError()
-}
-typealias HotelFetchResult = Either<HotelFetchError, Hotel?>
-
-sealed class HotelCreationError {
-    object HotelAlreadyExists : HotelCreationError()
-}
-typealias HotelCreationResult = Either<HotelCreationError, Boolean>
 
 @Component
 class HotelServices(
     private val tm: TransactionManager,
-    private val hotelDomain: UserDomain,
+    private val domain: UserDomain,
     private val clock: Clock,
 ) {
     fun createHotel(
@@ -32,24 +21,23 @@ class HotelServices(
         stars: Int,
         latitude: Double,
         longitude: Double,
-    ): HotelCreationResult {
-        return tm.run { success(it.hotelRepository.createHotel(name, address, stars, latitude, longitude)) }
+    ): Boolean = tm.run {
+        //  TODO: Add parameter checking via domain here
+        it.hotelRepository.createHotel(name, address, stars, latitude, longitude)
     }
 
     fun getHotel(
         id: Int
-    ): HotelFetchResult {
-        val hotel = tm.run { it.hotelRepository.getHotel(id) }
-        if(hotel == null) failure(HotelFetchError.HotelDoesntExist)
-        return success(hotel)
+    ): Hotel = tm.run {
+        requireOrThrow<HotelDoesntExist>(it.hotelRepository.hotelExists(id)) { "Hotel doesn't exist" }
+        it.hotelRepository.getHotel(id)
     }
 
     fun getHotels(
         stars: Int?,
         features: List<Feature>?
-    ): List<Hotel> {
-        return tm.run {
-            it.hotelRepository.getHotels(stars, features)
-        }
+    ): List<Hotel> = tm.run {
+        //  TODO: Add parameter checking via domain here
+        it.hotelRepository.getHotels(stars, features)
     }
 }

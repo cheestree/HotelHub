@@ -33,7 +33,7 @@ create table hotelhub.hotel
 
 create table hotelhub.features
 (
-    id int not null,
+    id      int         not null,
     feature varchar(32) not null,
     foreign key (id) references hotelhub.hotel (id)
 );
@@ -41,8 +41,8 @@ create table hotelhub.features
 create table hotelhub.critique
 (
     id          serial primary key,
-    user_id     int,
-    hotel_id    int,
+    user_id     int                               not null,
+    hotel_id    int                               not null,
     stars       int check (stars between 1 and 5) not null,
     description varchar(512)                      not null,
     foreign key (user_id) references hotelhub.user (id),

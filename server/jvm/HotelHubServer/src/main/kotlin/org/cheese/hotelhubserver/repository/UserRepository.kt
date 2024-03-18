@@ -13,7 +13,8 @@ interface UserRepository {
         passwordValidation: PasswordValidationInfo,
     ): Int
 
-    fun getUserByUsername(username: String): User?
+    fun getUserByUsername(username: String): User
+    fun getUserById(user: Int): Boolean
 
     fun getTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>?
 
