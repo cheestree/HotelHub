@@ -25,7 +25,16 @@ class JdbiCritiqueRepository(
     }
 
     override fun deleteCritique(user: Int, hotel: Int): Boolean {
-        TODO("Not yet implemented")
+        return handle.createUpdate(
+            """
+                delete from hotelhub.critique where user_id = :user and hotel_id = :hotel
+            """
+        )
+            .bind("user", user)
+            .bind("hote", hotel)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Critique>()
+            .singleOrNull() != null
     }
 
     override fun editCritique(critiqueId: Int, time: Instant, stars: Int, description: String): Boolean {
@@ -43,8 +52,19 @@ class JdbiCritiqueRepository(
             .single()
     }
 
-    override fun getCritiques(hotel: Int): List<Critique> {
-        TODO("Not yet implemented")
+    override fun getCritiques(hotel: Int, offset: Int, limit: Int): List<Critique> {
+        return handle.createQuery(
+            """
+                select * from hotelhub.critique where hotel_id = :hotel
+                offset :offset
+                limit :limit
+            """
+        )
+            .bind("hotel", hotel)
+            .bind("offset", offset)
+            .bind("limit", limit)
+            .mapTo<Critique>()
+            .list()
     }
 
     override fun critiqueExists(critiqueId: Int): Boolean {

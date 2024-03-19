@@ -52,4 +52,11 @@ class CritiqueServices(
         requireOrThrow<CritiqueDoesntExist>(it.critiqueRepository.critiqueExists(critiqueId)) { "Critique doesn't exist" }
         it.critiqueRepository.getCritique(critiqueId)
     }
+
+    fun getCritiques(
+        hotelId: Int
+    ): List<Critique> = tm.run {
+        requireOrThrow<HotelDoesntExist>(it.hotelRepository.hotelExists(hotelId)) { "Hotel doesn't exist" }
+        it.critiqueRepository.getCritiques(hotelId)
+    }
 }

@@ -16,11 +16,11 @@ class CritiqueMapper : ColumnMapper<Critique> {
     ): Critique {
         return Critique(
             id = r.getInt("id"),
-            user_id = r.getInt("user_id"),
-            hotel_id = r.getInt("hotel_id"),
+            userId = r.getInt("user_id"),
+            hotelId = r.getInt("hotel_id"),
             edited = r.getBoolean("edited"),
-            created_at = truncateSeconds(r.getTimestamp("created_at")),
-            edited_at = truncateSeconds(r.getTimestamp("edited_at")),
+            createdAt = truncateSeconds(r.getTimestamp("created_at")),
+            editedAt = truncateSeconds(r.getTimestamp("edited_at")),
             stars = r.getInt("stars"),
             description = r.getString("description")
         )

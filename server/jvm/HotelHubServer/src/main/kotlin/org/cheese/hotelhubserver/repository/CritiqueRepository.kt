@@ -12,7 +12,7 @@ interface CritiqueRepository {
 
     fun getCritique(critiqueId: Int): Critique
 
-    fun getCritiques(hotel: Int): List<Critique>
+    fun getCritiques(hotel: Int, offset: Int, limit: Int): List<Critique>
 
     fun critiqueExists(critiqueId: Int): Boolean
 

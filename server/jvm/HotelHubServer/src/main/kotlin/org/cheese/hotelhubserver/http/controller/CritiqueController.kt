@@ -51,4 +51,12 @@ class CritiqueController(
         val res = critiqueServices.getCritique(critiqueId)
         return ResponseEntity.status(200).body(res)
     }
+
+    @GetMapping(Uris.Critique.GETLIST)
+    fun getCritiques(
+        @Valid @PathVariable hotelId: Int
+    ): ResponseEntity<*> {
+        val res = critiqueServices.getCritiques(hotelId)
+        return ResponseEntity.status(200).body(res)
+    }
 }
