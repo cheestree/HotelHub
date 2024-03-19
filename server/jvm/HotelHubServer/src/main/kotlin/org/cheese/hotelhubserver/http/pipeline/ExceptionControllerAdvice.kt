@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.ConstraintViolationException
 import org.cheese.hotelhubserver.domain.exceptions.HotelExceptions.HotelDoesntExist
 import org.cheese.hotelhubserver.domain.exceptions.HotelExceptions.HotelAlreadyExists
+import org.cheese.hotelhubserver.domain.exceptions.CritiqueExceptions.CritiqueAlreadyExists
+import org.cheese.hotelhubserver.domain.exceptions.CritiqueExceptions.CritiqueDoesntExist
 import org.cheese.hotelhubserver.http.model.Problem
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -41,9 +43,21 @@ class ExceptionControllerAdvice {
 
     @ExceptionHandler(
         value = [
-            IllegalArgumentException::class,
             HotelDoesntExist::class,
+            CritiqueDoesntExist::class,
+        ]
+    )
+    fun handleNotFound(request: HttpServletRequest, ex: Exception) =
+        ex.handle(
+            request = request,
+            status = HttpStatus.NOT_FOUND
+        )
+
+    @ExceptionHandler(
+        value = [
+            IllegalArgumentException::class,
             HotelAlreadyExists::class,
+            CritiqueAlreadyExists::class
         ]
     )
     fun handleBadRequest(request: HttpServletRequest, ex: Exception) =
@@ -67,7 +81,6 @@ class ExceptionControllerAdvice {
                 //.also {
                 //logger.warn("Handled Exception: {}", message)
             //}
-
 
         private fun Exception.getName(): String =
             (this::class.simpleName ?: "Unknown")

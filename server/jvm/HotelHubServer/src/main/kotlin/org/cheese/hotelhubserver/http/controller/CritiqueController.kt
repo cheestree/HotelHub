@@ -19,10 +19,9 @@ class CritiqueController(
     @PostMapping(Uris.Critique.CREATE)
     fun createCritique(
         user: AuthenticatedUser,
-        @Valid @RequestBody critique: CritiqueCreateInputModel,
-        @Valid @PathVariable critiqueId: Int
+        @Valid @RequestBody critique: CritiqueCreateInputModel
     ): ResponseEntity<*> {
-        val res = critiqueServices.createCritique(user.user.id, critiqueId, critique.stars, critique.description)
+        val res = critiqueServices.createCritique(user.user.id, critique.hotelId, critique.stars, critique.description)
         return ResponseEntity.status(CREATED).body(res)
     }
 
@@ -43,5 +42,13 @@ class CritiqueController(
     ): ResponseEntity<*> {
         critiqueServices.editCritique(user.user.id, critiqueId, critique.critiqueId, critique.stars, critique.description)
         return ResponseEntity.status(204).body(critiqueId)
+    }
+
+    @GetMapping(Uris.Critique.GET)
+    fun getCritique(
+        @Valid @PathVariable critiqueId: Int
+    ): ResponseEntity<*> {
+        val res = critiqueServices.getCritique(critiqueId)
+        return ResponseEntity.status(200).body(res)
     }
 }

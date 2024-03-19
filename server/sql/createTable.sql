@@ -14,7 +14,7 @@ create table hotelhub.user
 
 create table hotelhub.token
 (
-    token_validation VARCHAR(256) primary key,
+    token_validation varchar(256) primary key,
     user_id          int,
     created_at       bigint not null,
     last_used_at     bigint not null,
@@ -43,6 +43,9 @@ create table hotelhub.critique
     id          serial primary key,
     user_id     int                               not null,
     hotel_id    int                               not null,
+    edited      boolean   default false,
+    created_at  timestamp                         not null,
+    edited_at   timestamp default null,
     stars       int check (stars between 1 and 5) not null,
     description varchar(512)                      not null,
     foreign key (user_id) references hotelhub.user (id),

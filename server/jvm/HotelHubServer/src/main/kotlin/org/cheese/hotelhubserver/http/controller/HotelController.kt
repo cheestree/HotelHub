@@ -2,7 +2,6 @@ package org.cheese.hotelhubserver.http.controller
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotEmpty
 import org.cheese.hotelhubserver.domain.Feature
 import org.cheese.hotelhubserver.http.Uris
 import org.cheese.hotelhubserver.http.model.hotel.HotelCreateInputModel

@@ -1,6 +1,7 @@
 package org.cheese.hotelhubserver.services
 
 import kotlinx.datetime.Clock
+import org.cheese.hotelhubserver.domain.Critique
 import org.cheese.hotelhubserver.domain.exceptions.CritiqueExceptions.CritiqueAlreadyExists
 import org.cheese.hotelhubserver.domain.exceptions.CritiqueExceptions.HotelDoesntExist
 import org.cheese.hotelhubserver.domain.exceptions.CritiqueExceptions.CritiqueDoesntExist
@@ -20,17 +21,17 @@ class CritiqueServices(
         hotel: Int,
         stars: Int,
         description: String
-    ): Boolean = tm.run {
+    ): Int = tm.run {
         requireOrThrow<HotelDoesntExist>(it.hotelRepository.hotelExists(hotel)) { "Hotel doesn't exist" }
-        requireOrThrow<CritiqueAlreadyExists>(it.critiqueRepository.critiqueExists(user, hotel)) { "A critique already exists" }
-        it.critiqueRepository.createCritique(user, hotel, stars, description)
+        requireOrThrow<CritiqueAlreadyExists>(!it.critiqueRepository.critiqueExistsByUser(user, hotel)) { "A critique already exists" }
+        it.critiqueRepository.createCritique(user, hotel, clock.now(), stars, description)
     }
 
     fun deleteCritique(
         user: Int,
         hotel: Int
     ): Boolean = tm.run {
-        requireOrThrow<CritiqueDoesntExist>(it.critiqueRepository.critiqueExists(user, hotel)) { "Critique doesn't exist" }
+        requireOrThrow<CritiqueDoesntExist>(it.critiqueRepository.critiqueExistsByUser(user, hotel)) { "Critique doesn't exist" }
         it.critiqueRepository.deleteCritique(user, hotel)
     }
 
@@ -41,7 +42,14 @@ class CritiqueServices(
         stars: Int,
         description: String
     ): Boolean = tm.run {
-        requireOrThrow<CritiqueDoesntExist>(it.critiqueRepository.critiqueExists(user, hotel)) { "Critique doesn't exist" }
-        it.critiqueRepository.editCritique(critiqueId, stars, description)
+        requireOrThrow<CritiqueDoesntExist>(it.critiqueRepository.critiqueExistsByUser(user, hotel)) { "Critique doesn't exist" }
+        it.critiqueRepository.editCritique(critiqueId, clock.now(), stars, description)
+    }
+
+    fun getCritique(
+        critiqueId: Int
+    ): Critique = tm.run {
+        requireOrThrow<CritiqueDoesntExist>(it.critiqueRepository.critiqueExists(critiqueId)) { "Critique doesn't exist" }
+        it.critiqueRepository.getCritique(critiqueId)
     }
 }

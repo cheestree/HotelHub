@@ -23,9 +23,11 @@ class AuthenticationInterceptor(
             }
         ) {
             // enforce authentication
-            val user =
-                authorizationHeaderProcessor
-                    .processAuthorizationHeaderValue(request.getHeader(NAME_AUTHORIZATION_HEADER))
+            var user = authorizationHeaderProcessor
+                .processAuthorizationHeaderValue(request.getHeader(NAME_AUTHORIZATION_HEADER))
+            if (user == null){
+                user = authorizationHeaderProcessor.processCookieValue(request.cookies)
+            }
             return if (user == null) {
                 response.status = 401
                 response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)

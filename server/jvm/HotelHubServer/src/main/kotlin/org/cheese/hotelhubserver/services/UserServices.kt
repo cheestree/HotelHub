@@ -27,7 +27,7 @@ class UserServices(
 
         return tm.run {
             val usersRepository = it.userRepository
-            requireOrThrow<UserAlreadyExists>(usersRepository.isUserStoredByUsername(username)) { "User already exists" }
+            requireOrThrow<UserAlreadyExists>(!usersRepository.isUserStoredByUsername(username)) { "User already exists" }
             usersRepository.storeUser(username, email, passwordValidationInfo)
         }
     }

@@ -18,7 +18,8 @@ object Uris {
     }
 
     object Critique {
-        const val CREATE = "$PREFIX/critique/{critiqueId}"
+        const val CREATE = "$PREFIX/critique"
+        const val GET = "$PREFIX/critique/{critiqueId}"
         const val DELETE = "$PREFIX/critique/{critiqueId}"
         const val EDIT = "$PREFIX/critique/{critiqueId}"
     }
