@@ -3,6 +3,8 @@ package org.cheese.hotelhubserver.repository
 import kotlinx.datetime.Instant
 import org.cheese.hotelhubserver.domain.Critique
 
+const val PAGE_LIMIT = 50
+
 interface CritiqueRepository {
     fun createCritique(user: Int, hotel: Int, time: Instant, stars: Int, description: String): Int
 
@@ -12,7 +14,7 @@ interface CritiqueRepository {
 
     fun getCritique(critiqueId: Int): Critique
 
-    fun getCritiques(hotel: Int, offset: Int, limit: Int): List<Critique>
+    fun getCritiques(hotel: Int, offset: Int = 0, limit: Int = PAGE_LIMIT): List<Critique>
 
     fun critiqueExists(critiqueId: Int): Boolean
 
