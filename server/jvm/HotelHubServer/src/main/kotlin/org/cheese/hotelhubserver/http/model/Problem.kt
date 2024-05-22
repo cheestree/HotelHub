@@ -12,11 +12,10 @@ data class Problem(
     fun toResponse(status: HttpStatusCode, headers: HttpHeaders? = null) =
         ResponseEntity
             .status(status)
-            .header("Content-Type", "application/problem+json")
+            .header("Content-Type", MEDIA_TYPE)
             .headers(headers)
             .body<Problem>(this)
     companion object {
         const val MEDIA_TYPE = "application/problem+json"
-
     }
 }

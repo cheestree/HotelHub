@@ -1,11 +1,11 @@
-package org.cheese.hotelhubserver.repository.jdbi
+package org.cheese.hotelhubserver.repository.jdbi.user
 
 import kotlinx.datetime.Instant
 import org.cheese.hotelhubserver.domain.user.PasswordValidationInfo
 import org.cheese.hotelhubserver.domain.user.User
 import org.cheese.hotelhubserver.domain.user.token.Token
 import org.cheese.hotelhubserver.domain.user.token.TokenValidationInfo
-import org.cheese.hotelhubserver.repository.UserRepository
+import org.cheese.hotelhubserver.repository.interfaces.user.UserRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.LoggerFactory

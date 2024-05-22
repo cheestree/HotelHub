@@ -1,4 +1,4 @@
-package org.cheese.hotelhubserver.repository
+package org.cheese.hotelhubserver.repository.interfaces.user
 
 import kotlinx.datetime.Instant
 import org.cheese.hotelhubserver.domain.user.PasswordValidationInfo
@@ -12,23 +12,17 @@ interface UserRepository {
         email: String,
         passwordValidation: PasswordValidationInfo,
     ): Int
-
     fun getUserByUsername(username: String): User
     fun getUserById(user: Int): Boolean
-
     fun getTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>?
-
     fun isUserStoredByUsername(username: String): Boolean
-
     fun createToken(
         token: Token,
         maxTokens: Int,
     )
-
     fun updateTokenLastUsed(
         token: Token,
         now: Instant,
     )
-
     fun removeTokenByValidationInfo(tokenValidationInfo: TokenValidationInfo): Int
 }

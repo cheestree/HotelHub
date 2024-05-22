@@ -18,26 +18,22 @@ class AuthenticationInterceptor(
         handler: Any,
     ): Boolean {
         if (handler is HandlerMethod &&
-            handler.methodParameters.any {
-                it.parameterType == AuthenticatedUser::class.java
-            }
+            handler.methodParameters.any { it.parameterType == AuthenticatedUser::class.java }
         ) {
-            // enforce authentication
-            var user = authorizationHeaderProcessor
-                .processAuthorizationHeaderValue(request.getHeader(NAME_AUTHORIZATION_HEADER))
-            if (user == null){
-                user = authorizationHeaderProcessor.processCookieValue(request.cookies)
-            }
+            val user = authorizationHeaderProcessor.processAuthorizationHeaderValue(request.getHeader(NAME_AUTHORIZATION_HEADER))
+                ?: authorizationHeaderProcessor.processCookieValue(request.cookies)
+
             return if (user == null) {
-                response.status = 401
-                response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)
+                response.apply {
+                    status = 401
+                    addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)
+                }
                 false
             } else {
                 AuthenticatedUserArgumentResolver.addUserTo(user, request)
                 true
             }
         }
-
         return true
     }
 

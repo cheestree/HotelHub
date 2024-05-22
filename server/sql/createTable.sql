@@ -33,9 +33,16 @@ create table hotelhub.hotel
 
 create table hotelhub.features
 (
-    id      int         not null,
-    feature varchar(32) not null,
-    foreign key (id) references hotelhub.hotel (id)
+    id      serial primary key,
+    feature varchar(48) not null
+);
+
+create table hotelhub.hotel_features
+(
+    hotel   int not null,
+    feature int not null,
+    foreign key (hotel) references hotelhub.hotel (id),
+    foreign key (feature) references hotelhub.features (id)
 );
 
 create table hotelhub.critique

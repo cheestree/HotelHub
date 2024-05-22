@@ -22,7 +22,8 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("jakarta.validation:jakarta.validation-api")
-    implementation("org.springframework.boot:spring-boot-starter-web:2.7.0")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-rest")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
 

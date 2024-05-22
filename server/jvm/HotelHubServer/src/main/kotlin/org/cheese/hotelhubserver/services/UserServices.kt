@@ -1,12 +1,14 @@
 package org.cheese.hotelhubserver.services
 
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletResponse
 import kotlinx.datetime.Clock
 import org.cheese.hotelhubserver.domain.exceptions.UserExceptions.*
 import org.cheese.hotelhubserver.domain.user.User
 import org.cheese.hotelhubserver.domain.user.UserDomain
 import org.cheese.hotelhubserver.domain.user.token.Token
 import org.cheese.hotelhubserver.domain.user.token.TokenExternalInfo
-import org.cheese.hotelhubserver.repository.TransactionManager
+import org.cheese.hotelhubserver.repository.interfaces.TransactionManager
 import org.cheese.hotelhubserver.util.requireOrThrow
 import org.springframework.stereotype.Component
 
@@ -85,5 +87,38 @@ class UserServices(
             it.userRepository.removeTokenByValidationInfo(tokenValidationInfo)
             true
         }
+    }
+
+    fun createCookie(response: HttpServletResponse, token: TokenExternalInfo, username: String) {
+        val cookie = Cookie("token", token.tokenValue).also {
+            it.path = "/api"
+            it.maxAge = token.tokenExpiration.epochSeconds.toInt()
+            it.isHttpOnly = true
+        }
+        val playerStats: User = tm.run {
+            it.userRepository.getUserByUsername(username)
+        }
+        val player = Cookie("player", playerStats.toString()).also {
+            it.path = "/"
+            it.maxAge = token.tokenExpiration.epochSeconds.toInt()
+            it.isHttpOnly = false
+        }
+        response.addCookie(cookie)
+        response.addCookie(player)
+    }
+
+    fun deleteCookie(response: HttpServletResponse) {
+        val cookie = Cookie("token", "").also {
+            it.path = "/api"
+            it.maxAge = 0
+            it.isHttpOnly = true
+        }
+        val player = Cookie("player", "").also {
+            it.path = "/"
+            it.maxAge = 0
+            it.isHttpOnly = false
+        }
+        response.addCookie(cookie)
+        response.addCookie(player)
     }
 }

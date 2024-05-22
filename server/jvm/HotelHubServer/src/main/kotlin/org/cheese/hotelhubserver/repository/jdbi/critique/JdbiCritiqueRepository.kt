@@ -1,8 +1,8 @@
-package org.cheese.hotelhubserver.repository.jdbi
+package org.cheese.hotelhubserver.repository.jdbi.critique
 
 import kotlinx.datetime.*
-import org.cheese.hotelhubserver.domain.Critique
-import org.cheese.hotelhubserver.repository.CritiqueRepository
+import org.cheese.hotelhubserver.domain.critique.Critique
+import org.cheese.hotelhubserver.repository.interfaces.critique.CritiqueRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
@@ -41,7 +41,7 @@ class JdbiCritiqueRepository(
         TODO("Not yet implemented")
     }
 
-    override fun getCritique(critiqueId: Int): Critique {
+    override fun getCritiqueById(critiqueId: Int): Critique {
         return handle.createQuery(
             """
                 select * from hotelhub.critique where id = :critiqueId

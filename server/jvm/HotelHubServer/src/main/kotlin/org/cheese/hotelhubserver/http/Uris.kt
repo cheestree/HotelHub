@@ -15,6 +15,8 @@ object Uris {
         const val CREATE = "$PREFIX/hotel"
         const val GETHOTEL = "$PREFIX/hotel/{hotelId}"
         const val GETHOTELS = "$PREFIX/hotel"
+
+        const val GETFEATURES = "$PREFIX/hotel/features"
     }
 
     object Critique {

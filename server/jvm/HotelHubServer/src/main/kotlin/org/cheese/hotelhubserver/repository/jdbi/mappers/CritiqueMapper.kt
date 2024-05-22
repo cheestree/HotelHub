@@ -1,6 +1,6 @@
 package org.cheese.hotelhubserver.repository.jdbi.mappers
 
-import org.cheese.hotelhubserver.domain.Critique
+import org.cheese.hotelhubserver.domain.critique.Critique
 import org.jdbi.v3.core.mapper.ColumnMapper
 import org.jdbi.v3.core.statement.StatementContext
 import java.sql.ResultSet

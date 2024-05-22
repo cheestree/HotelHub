@@ -21,8 +21,9 @@ class CritiqueController(
         user: AuthenticatedUser,
         @Valid @RequestBody critique: CritiqueCreateInputModel
     ): ResponseEntity<*> {
-        val res = critiqueServices.createCritique(user.user.id, critique.hotelId, critique.stars, critique.description)
-        return ResponseEntity.status(CREATED).body(res)
+        return ResponseEntity.status(CREATED).body(
+            critiqueServices.createCritique(user.user.id, critique.hotelId, critique.stars, critique.description)
+        )
     }
 
     @DeleteMapping(Uris.Critique.DELETE)
@@ -30,8 +31,7 @@ class CritiqueController(
         user: AuthenticatedUser,
         @Valid @PathVariable critiqueId: Int
     ): ResponseEntity<*> {
-        val res = critiqueServices.deleteCritique(user.user.id, critiqueId)
-        return ResponseEntity.status(204).body(res)
+        return ResponseEntity.status(204).body(critiqueServices.deleteCritique(user.user.id, critiqueId))
     }
 
     @PutMapping(Uris.Critique.EDIT)
@@ -48,15 +48,13 @@ class CritiqueController(
     fun getCritique(
         @Valid @PathVariable critiqueId: Int
     ): ResponseEntity<*> {
-        val res = critiqueServices.getCritique(critiqueId)
-        return ResponseEntity.status(200).body(res)
+        return ResponseEntity.status(200).body(critiqueServices.getCritique(critiqueId))
     }
 
     @GetMapping(Uris.Critique.GETLIST)
     fun getCritiques(
         @Valid @PathVariable hotelId: Int
     ): ResponseEntity<*> {
-        val res = critiqueServices.getCritiques(hotelId)
-        return ResponseEntity.status(200).body(res)
+        return ResponseEntity.status(200).body(critiqueServices.getCritiques(hotelId))
     }
 }

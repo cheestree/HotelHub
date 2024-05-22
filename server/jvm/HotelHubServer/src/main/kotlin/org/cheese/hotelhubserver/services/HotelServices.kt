@@ -1,18 +1,19 @@
 package org.cheese.hotelhubserver.services
 
 import kotlinx.datetime.Clock
-import org.cheese.hotelhubserver.domain.Feature
-import org.cheese.hotelhubserver.domain.Hotel
+import org.cheese.hotelhubserver.domain.hotel.Hotel
 import org.cheese.hotelhubserver.domain.exceptions.HotelExceptions.HotelDoesntExist
+import org.cheese.hotelhubserver.domain.hotel.HotelDomain
 import org.cheese.hotelhubserver.domain.user.UserDomain
-import org.cheese.hotelhubserver.repository.TransactionManager
+import org.cheese.hotelhubserver.http.model.hotel.HotelOutputModel
+import org.cheese.hotelhubserver.repository.interfaces.TransactionManager
 import org.cheese.hotelhubserver.util.requireOrThrow
 import org.springframework.stereotype.Component
 
 @Component
 class HotelServices(
     private val tm: TransactionManager,
-    private val domain: UserDomain,
+    private val domain: HotelDomain,
     private val clock: Clock,
 ) {
     fun createHotel(
@@ -35,9 +36,13 @@ class HotelServices(
 
     fun getHotels(
         stars: Int?,
-        features: List<Feature>?
-    ): List<Hotel> = tm.run {
+        features: List<String>?
+    ): List<HotelOutputModel> = tm.run {
         //  TODO: Add parameter checking via domain here
         it.hotelRepository.getHotels(stars, features)
+    }
+
+    fun getFeatures(): List<String> = tm.run {
+        it.hotelRepository.getFeatures()
     }
 }

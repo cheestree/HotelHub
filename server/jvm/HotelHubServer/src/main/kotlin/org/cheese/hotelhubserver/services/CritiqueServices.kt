@@ -1,19 +1,19 @@
 package org.cheese.hotelhubserver.services
 
 import kotlinx.datetime.Clock
-import org.cheese.hotelhubserver.domain.Critique
+import org.cheese.hotelhubserver.domain.critique.Critique
+import org.cheese.hotelhubserver.domain.critique.CritiqueDomain
 import org.cheese.hotelhubserver.domain.exceptions.CritiqueExceptions.CritiqueAlreadyExists
 import org.cheese.hotelhubserver.domain.exceptions.CritiqueExceptions.HotelDoesntExist
 import org.cheese.hotelhubserver.domain.exceptions.CritiqueExceptions.CritiqueDoesntExist
-import org.cheese.hotelhubserver.domain.user.UserDomain
-import org.cheese.hotelhubserver.repository.TransactionManager
+import org.cheese.hotelhubserver.repository.interfaces.TransactionManager
 import org.cheese.hotelhubserver.util.requireOrThrow
 import org.springframework.stereotype.Component
 
 @Component
 class CritiqueServices(
     private val tm: TransactionManager,
-    private val domain: UserDomain,
+    private val domain: CritiqueDomain,
     private val clock: Clock,
 ) {
     fun createCritique(
@@ -50,7 +50,7 @@ class CritiqueServices(
         critiqueId: Int
     ): Critique = tm.run {
         requireOrThrow<CritiqueDoesntExist>(it.critiqueRepository.critiqueExists(critiqueId)) { "Critique doesn't exist" }
-        it.critiqueRepository.getCritique(critiqueId)
+        it.critiqueRepository.getCritiqueById(critiqueId)
     }
 
     fun getCritiques(

@@ -1,4 +1,4 @@
-package org.cheese.hotelhubserver.domain
+package org.cheese.hotelhubserver.domain.critique
 
 import java.sql.Timestamp
 

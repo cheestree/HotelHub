@@ -1,5 +1,6 @@
 package org.cheese.hotelhubserver.http.controller
 
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotEmpty
@@ -28,15 +29,19 @@ class UserController(
     @PostMapping(Uris.User.TOKEN)
     fun login(
         @Valid @RequestBody input: UserCreateTokenInputModel,
+        response: HttpServletResponse
     ): ResponseEntity<*> {
         val res = userServices.login(input.username, input.password)
+        userServices.createCookie(response, res, input.username)
         return ResponseEntity.ok(res.tokenValue)
     }
 
     @PostMapping(Uris.User.LOGOUT)
     fun logout(
-        user: AuthenticatedUser
+        user: AuthenticatedUser,
+        response: HttpServletResponse
     ) {
+        userServices.deleteCookie(response)
         userServices.revokeToken(user.token)
     }
 

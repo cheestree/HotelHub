@@ -1,7 +1,7 @@
-package org.cheese.hotelhubserver.repository
+package org.cheese.hotelhubserver.repository.interfaces.critique
 
 import kotlinx.datetime.Instant
-import org.cheese.hotelhubserver.domain.Critique
+import org.cheese.hotelhubserver.domain.critique.Critique
 
 const val PAGE_LIMIT = 50
 
@@ -12,7 +12,7 @@ interface CritiqueRepository {
 
     fun editCritique(critiqueId: Int, time: Instant, stars: Int, description: String): Boolean
 
-    fun getCritique(critiqueId: Int): Critique
+    fun getCritiqueById(critiqueId: Int): Critique
 
     fun getCritiques(hotel: Int, offset: Int = 0, limit: Int = PAGE_LIMIT): List<Critique>
 

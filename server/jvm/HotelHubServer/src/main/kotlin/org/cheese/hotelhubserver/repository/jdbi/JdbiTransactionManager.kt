@@ -1,7 +1,7 @@
 package org.cheese.hotelhubserver.repository.jdbi
 
-import org.cheese.hotelhubserver.repository.Transaction
-import org.cheese.hotelhubserver.repository.TransactionManager
+import org.cheese.hotelhubserver.repository.interfaces.Transaction
+import org.cheese.hotelhubserver.repository.interfaces.TransactionManager
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Component
 
