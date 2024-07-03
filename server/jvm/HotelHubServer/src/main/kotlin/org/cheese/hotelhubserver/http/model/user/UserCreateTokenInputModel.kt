@@ -1,15 +1,13 @@
 package org.cheese.hotelhubserver.http.model.user
 
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 
 data class UserCreateTokenInputModel(
-    @NotEmpty
-    @Min(value = USERNAME_MIN_LENGTH, message = "Username must be at least $USERNAME_MIN_LENGTH characters long")
-    @Max(value = USERNAME_MAX_LENGTH, message = "Username must be at most $USERNAME_MAX_LENGTH characters long")
+    @field:NotBlank(message = "can't be blank")
+    @field:Size(min = USERNAME_MIN_LENGTH, max = USERNAME_MAX_LENGTH, message = "must be between $USERNAME_MIN_LENGTH and $USERNAME_MAX_LENGTH characters long")
     val username: String,
-    @NotEmpty
-    @Min(value = 6, message = "Password must be at least $PASSWORD_MIN_LENGTH characters long")
+    @field:NotBlank(message = "can't be blank")
+    @field:Size(min = PASSWORD_MIN_LENGTH, message = "must be at least $PASSWORD_MIN_LENGTH characters long")
     val password: String,
 )

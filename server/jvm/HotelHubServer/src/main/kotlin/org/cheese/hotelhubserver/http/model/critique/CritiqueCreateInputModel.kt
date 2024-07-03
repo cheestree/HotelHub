@@ -13,5 +13,5 @@ data class CritiqueCreateInputModel(
     val hotelId: Int,
     @field:NotBlank(message = "Must not be empty")
     @field:Size(max = 512, message = "Must be between 1-512 characters")
-    val description: String
+    val description: String,
 )

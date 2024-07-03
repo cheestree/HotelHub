@@ -2,6 +2,7 @@ package org.cheese.hotelhubserver.repository.jdbi.user
 
 import kotlinx.datetime.Instant
 import org.cheese.hotelhubserver.domain.user.PasswordValidationInfo
+import org.cheese.hotelhubserver.domain.user.Role
 import org.cheese.hotelhubserver.domain.user.User
 import org.cheese.hotelhubserver.domain.user.token.Token
 import org.cheese.hotelhubserver.domain.user.token.TokenValidationInfo
@@ -20,9 +21,11 @@ class JdbiUserRepository(
             .single()
 
     override fun getUserById(user: Int): Boolean {
-        return handle.createQuery("""
+        return handle.createQuery(
+            """
             select * from hotelhub.user where id = :user
-        """)
+        """,
+        )
             .bind("user", user)
             .mapTo<User>()
             .singleOrNull() != null
@@ -32,15 +35,17 @@ class JdbiUserRepository(
         username: String,
         email: String,
         passwordValidation: PasswordValidationInfo,
+        role: Role,
     ): Int =
         handle.createUpdate(
             """
-            insert into hotelhub.user (username, email, password_validation) values (:username, :email, :password_validation)
+            insert into hotelhub.user (username, email, password_validation, role) values (:username, :email, :password_validation, :role)
             """,
         )
             .bind("username", username)
             .bind("email", email)
             .bind("password_validation", passwordValidation.validationInfo)
+            .bind("role", role.name)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .one()

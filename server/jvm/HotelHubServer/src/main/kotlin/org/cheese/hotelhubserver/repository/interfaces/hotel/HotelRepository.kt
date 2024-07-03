@@ -10,10 +10,17 @@ interface HotelRepository {
         stars: Int,
         latitude: Double,
         longitude: Double,
-        features: List<Int>? = null
+        features: List<Int>? = null,
     ): Boolean
+
     fun getHotel(id: Int): Hotel
-    fun getHotels(stars: Int? = null, features: List<String>? = null): List<HotelOutputModel>
+
+    fun getHotels(
+        stars: Int? = null,
+        features: List<String>? = null,
+    ): List<HotelOutputModel>
+
     fun hotelExists(id: Int): Boolean
+
     fun getFeatures(): List<String>
 }

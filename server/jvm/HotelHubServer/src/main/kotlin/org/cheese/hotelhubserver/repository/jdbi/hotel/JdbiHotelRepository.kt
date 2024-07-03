@@ -15,12 +15,12 @@ class JdbiHotelRepository(
         stars: Int,
         latitude: Double,
         longitude: Double,
-        features: List<Int>?
+        features: List<Int>?,
     ): Boolean {
         return handle.createUpdate(
             """
                 insert into hotelhub.hotel (name, address, stars, latitude, longitude) values (:name, :address, :stars, :latitude, :longitude);
-            """
+            """,
         )
             .bind("name", name)
             .bind("address", address)
@@ -37,9 +37,12 @@ class JdbiHotelRepository(
             .single()
     }
 
-    override fun getHotels(stars: Int?, features: List<String>?): List<HotelOutputModel> {
+    override fun getHotels(
+        stars: Int?,
+        features: List<String>?,
+    ): List<HotelOutputModel> {
         return handle.createQuery(
-            """select * from hotelhub.hotel"""
+            """select * from hotelhub.hotel""",
         )
             .mapTo<HotelOutputModel>()
             .list()
@@ -49,7 +52,7 @@ class JdbiHotelRepository(
         return handle.createQuery(
             """
                 select * from hotelhub.hotel where id = :id
-            """
+            """,
         )
             .bind("id", id)
             .mapTo<Hotel>()
@@ -58,7 +61,7 @@ class JdbiHotelRepository(
 
     override fun getFeatures(): List<String> {
         return handle.createQuery(
-            """select feature from hotelhub.features"""
+            """select feature from hotelhub.features""",
         )
             .mapTo<String>()
             .list()

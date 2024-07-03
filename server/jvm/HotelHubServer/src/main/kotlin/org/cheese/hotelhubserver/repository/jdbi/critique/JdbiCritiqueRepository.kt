@@ -8,13 +8,19 @@ import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiCritiqueRepository(
     private val handle: Handle,
-): CritiqueRepository {
-    override fun createCritique(user: Int, hotel: Int, time: Instant, stars: Int, description: String): Int {
+) : CritiqueRepository {
+    override fun createCritique(
+        user: Int,
+        hotel: Int,
+        time: Instant,
+        stars: Int,
+        description: String,
+    ): Int {
         val formattedTime = time.toLocalDateTime(TimeZone.UTC).toJavaLocalDateTime()
         return handle.createUpdate(
             """
                 insert into hotelhub.critique(user_id, hotel_id, created_at, edited_at, stars, description) VALUES (:user, :hotel, :time, NULL, :stars, :description)
-            """
+            """,
         )
             .bind("user", user)
             .bind("hotel", hotel)
@@ -24,11 +30,14 @@ class JdbiCritiqueRepository(
             .execute()
     }
 
-    override fun deleteCritique(user: Int, hotel: Int): Boolean {
+    override fun deleteCritique(
+        user: Int,
+        hotel: Int,
+    ): Boolean {
         return handle.createUpdate(
             """
                 delete from hotelhub.critique where user_id = :user and hotel_id = :hotel
-            """
+            """,
         )
             .bind("user", user)
             .bind("hote", hotel)
@@ -37,7 +46,12 @@ class JdbiCritiqueRepository(
             .singleOrNull() != null
     }
 
-    override fun editCritique(critiqueId: Int, time: Instant, stars: Int, description: String): Boolean {
+    override fun editCritique(
+        critiqueId: Int,
+        time: Instant,
+        stars: Int,
+        description: String,
+    ): Boolean {
         TODO("Not yet implemented")
     }
 
@@ -45,20 +59,24 @@ class JdbiCritiqueRepository(
         return handle.createQuery(
             """
                 select * from hotelhub.critique where id = :critiqueId
-            """
+            """,
         )
             .bind("critiqueId", critiqueId)
             .mapTo<Critique>()
             .single()
     }
 
-    override fun getCritiques(hotel: Int, offset: Int, limit: Int): List<Critique> {
+    override fun getCritiques(
+        hotel: Int,
+        offset: Int,
+        limit: Int,
+    ): List<Critique> {
         return handle.createQuery(
             """
                 select * from hotelhub.critique where hotel_id = :hotel
                 offset :offset
                 limit :limit
-            """
+            """,
         )
             .bind("hotel", hotel)
             .bind("offset", offset)
@@ -71,18 +89,21 @@ class JdbiCritiqueRepository(
         return handle.createQuery(
             """
                 select * from hotelhub.critique where id = :critiqueId
-            """
+            """,
         )
             .bind("critiqueId", critiqueId)
             .mapTo<Critique>()
             .singleOrNull() != null
     }
 
-    override fun critiqueExistsByUser(user: Int, hotel: Int): Boolean {
+    override fun critiqueExistsByUser(
+        user: Int,
+        hotel: Int,
+    ): Boolean {
         return handle.createQuery(
             """
                 select * from hotelhub.critique where user_id = :user and hotel_id = :hotel
-            """
+            """,
         )
             .bind("user", user)
             .bind("hotel", hotel)

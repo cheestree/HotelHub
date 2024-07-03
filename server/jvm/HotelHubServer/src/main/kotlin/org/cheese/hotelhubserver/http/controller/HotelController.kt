@@ -35,7 +35,7 @@ class HotelController(
 
     @GetMapping(Uris.Hotel.GETHOTEL)
     fun getHotel(
-        @Valid @Min(value = 1, message = "Must be at least 1") @PathVariable hotelId: Int
+        @Valid @Min(value = 1, message = "Must be at least 1") @PathVariable hotelId: Int,
     ): ResponseEntity<*> {
         val res = hotelServices.getHotel(hotelId)
         return ResponseEntity.ok().body(res)

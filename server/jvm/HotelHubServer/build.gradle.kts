@@ -27,6 +27,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
 
+    implementation("org.hibernate:hibernate-validator:8.0.1.Final")
+
     // for JDBI
     implementation("org.jdbi:jdbi3-core:3.38.0")
     implementation("org.jdbi:jdbi3-kotlin:3.38.0")
@@ -40,6 +42,8 @@ dependencies {
     implementation("org.springframework.security:spring-security-core:6.0.3")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.7.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
+
     // To use WebTestClient on tests
     testImplementation("org.springframework.boot:spring-boot-starter-webflux:2.7.0")
     testImplementation(kotlin("test"))

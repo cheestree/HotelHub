@@ -12,7 +12,7 @@ class CritiqueMapper : ColumnMapper<Critique> {
     override fun map(
         r: ResultSet,
         columnNumber: Int,
-        ctx: StatementContext
+        ctx: StatementContext,
     ): Critique {
         return Critique(
             id = r.getInt("id"),
@@ -22,7 +22,7 @@ class CritiqueMapper : ColumnMapper<Critique> {
             createdAt = truncateSeconds(r.getTimestamp("created_at")),
             editedAt = truncateSeconds(r.getTimestamp("edited_at")),
             stars = r.getInt("stars"),
-            description = r.getString("description")
+            description = r.getString("description"),
         )
     }
 

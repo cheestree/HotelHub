@@ -4,7 +4,10 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 @OptIn(ExperimentalContracts::class)
-inline fun <reified T : Exception> requireOrThrow(value: Boolean, lazyMessage: () -> Any) {
+inline fun <reified T : Exception> requireOrThrow(
+    value: Boolean,
+    lazyMessage: () -> Any,
+) {
     contract {
         returns() implies value
     }

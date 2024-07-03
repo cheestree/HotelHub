@@ -1,9 +1,9 @@
 package org.cheese.hotelhubserver.http.pipeline
 
+import jakarta.servlet.http.Cookie
 import org.cheese.hotelhubserver.domain.user.AuthenticatedUser
 import org.cheese.hotelhubserver.services.UserServices
 import org.springframework.stereotype.Component
-import jakarta.servlet.http.Cookie
 
 @Component
 class RequestTokenProcessor(
@@ -22,7 +22,7 @@ class RequestTokenProcessor(
     }
 
     fun processCookieValue(authorizationValue: Array<Cookie>?): AuthenticatedUser? {
-        if(authorizationValue == null) return null
+        if (authorizationValue == null) return null
         val cookie = authorizationValue.firstOrNull { it.name == "token" } ?: return null
         val cookieVal = cookie.value
         return usersService.getUserByToken(cookieVal)?.let {

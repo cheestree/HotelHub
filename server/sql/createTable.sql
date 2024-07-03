@@ -8,8 +8,8 @@ create table hotelhub.user
     username            varchar(24) unique                                                                                                                                   not null,
     email               text check (email ~
                                     '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$') not null not null not null,
-    password_validation varchar(256)                                                                                                                                         not null
-    /* phone_number varchar(20) */
+    password_validation varchar(256)                                                                                                                                         not null,
+        role varchar(16) check (role in ('USER', 'OWNER', 'ADMIN', 'EMPLOYEE')) not null
 );
 
 create table hotelhub.token

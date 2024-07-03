@@ -19,17 +19,17 @@ class CritiqueController(
     @PostMapping(Uris.Critique.CREATE)
     fun createCritique(
         user: AuthenticatedUser,
-        @Valid @RequestBody critique: CritiqueCreateInputModel
+        @Valid @RequestBody critique: CritiqueCreateInputModel,
     ): ResponseEntity<*> {
         return ResponseEntity.status(CREATED).body(
-            critiqueServices.createCritique(user.user.id, critique.hotelId, critique.stars, critique.description)
+            critiqueServices.createCritique(user.user.id, critique.hotelId, critique.stars, critique.description),
         )
     }
 
     @DeleteMapping(Uris.Critique.DELETE)
     fun deleteCritique(
         user: AuthenticatedUser,
-        @Valid @PathVariable critiqueId: Int
+        @Valid @PathVariable critiqueId: Int,
     ): ResponseEntity<*> {
         return ResponseEntity.status(204).body(critiqueServices.deleteCritique(user.user.id, critiqueId))
     }
@@ -38,7 +38,7 @@ class CritiqueController(
     fun editCritique(
         user: AuthenticatedUser,
         @Valid @RequestBody critique: CritiqueEditInputModel,
-        @Valid @PathVariable critiqueId: Int
+        @Valid @PathVariable critiqueId: Int,
     ): ResponseEntity<*> {
         critiqueServices.editCritique(user.user.id, critiqueId, critique.critiqueId, critique.stars, critique.description)
         return ResponseEntity.status(204).body(critiqueId)
@@ -46,14 +46,14 @@ class CritiqueController(
 
     @GetMapping(Uris.Critique.GET)
     fun getCritique(
-        @Valid @PathVariable critiqueId: Int
+        @Valid @PathVariable critiqueId: Int,
     ): ResponseEntity<*> {
         return ResponseEntity.status(200).body(critiqueServices.getCritique(critiqueId))
     }
 
     @GetMapping(Uris.Critique.GETLIST)
     fun getCritiques(
-        @Valid @PathVariable hotelId: Int
+        @Valid @PathVariable hotelId: Int,
     ): ResponseEntity<*> {
         return ResponseEntity.status(200).body(critiqueServices.getCritiques(hotelId))
     }

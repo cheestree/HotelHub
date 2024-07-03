@@ -10,5 +10,5 @@ data class Critique(
     val createdAt: Timestamp,
     val editedAt: Timestamp?,
     val stars: Int,
-    val description: String
+    val description: String,
 )
