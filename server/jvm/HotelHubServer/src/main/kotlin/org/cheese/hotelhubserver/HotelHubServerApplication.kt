@@ -21,11 +21,10 @@ import kotlin.time.Duration.Companion.hours
 @SpringBootApplication
 class HotelHubServerApplication {
     @Bean
-    fun jdbi() =
-        Jdbi.create(
+    fun jdbi() = Jdbi.create(
             PGSimpleDataSource().apply {
                 setURL(Environment.getDbUrl())
-            },
+            }
         ).configureWithAppRequirements()
 
     @Bean

@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
 import kotlinx.datetime.Clock
 import org.cheese.hotelhubserver.domain.exceptions.UserExceptions.*
+import org.cheese.hotelhubserver.domain.user.AuthenticatedUser
 import org.cheese.hotelhubserver.domain.user.Role
 import org.cheese.hotelhubserver.domain.user.User
 import org.cheese.hotelhubserver.domain.user.UserDomain
@@ -31,7 +32,7 @@ class UserServices(
 
         return tm.run {
             val usersRepository = it.userRepository
-            requireOrThrow<UserAlreadyExists>(!usersRepository.isUserStoredByUsername(username)) { "User already exists" }
+            requireOrThrow<UserAlreadyExists>(!usersRepository.userExistsByUsername(username)) { "User already exists" }
             usersRepository.storeUser(username, email, passwordValidationInfo, role)
         }
     }
@@ -41,8 +42,8 @@ class UserServices(
         password: String,
     ): TokenExternalInfo =
         tm.run {
-            requireOrThrow<UserOrPasswordAreInvalid>(it.userRepository.isUserStoredByUsername(username)) {
-                "Incorrect username or password"
+            requireOrThrow<UserDoesntExist>(it.userRepository.userExistsByUsername(username)) {
+                "User doesn't exist"
             }
             val user = it.userRepository.getUserByUsername(username)
             requireOrThrow<UserOrPasswordAreInvalid>(domain.validatePassword(password, user.passwordValidation)) {
@@ -50,6 +51,14 @@ class UserServices(
             }
             createToken(user.id)
         }
+
+    fun logout(
+        response: HttpServletResponse,
+        user: AuthenticatedUser,
+    ){
+        deleteCookie(response)
+        revokeToken(user.token)
+    }
 
     private fun createToken(userId: Int): TokenExternalInfo {
         val tokenValue = domain.generateTokenValue()
@@ -61,10 +70,7 @@ class UserServices(
                 createdAt = now,
                 lastUsedAt = now,
             )
-        tm.run {
-            requireOrThrow<UserNotFound>(it.userRepository.getUserById(userId)) { "User was not found" }
-            it.userRepository.createToken(token, 1)
-        }
+        tm.run { it.userRepository.createToken(token, 1) }
         return TokenExternalInfo(
             tokenValue = tokenValue,
             tokenExpiration = domain.getTokenExpiration(token),
@@ -85,6 +91,13 @@ class UserServices(
         }
     }
 
+    fun getUserById(id: Int): User {
+        return tm.run {
+            requireOrThrow<UserNotFound>(it.userRepository.userExists(id)) { "User was not found" }
+            it.userRepository.getUserById(id)
+        }
+    }
+
     fun revokeToken(token: String): Boolean {
         val tokenValidationInfo = domain.createTokenValidationInformation(token)
         return tm.run {
@@ -98,39 +111,35 @@ class UserServices(
         token: TokenExternalInfo,
         username: String,
     ) {
-        val cookie =
-            Cookie("token", token.tokenValue).also {
-                it.path = "/api"
-                it.maxAge = token.tokenExpiration.epochSeconds.toInt()
-                it.isHttpOnly = true
-            }
-        val playerStats: User =
-            tm.run {
-                it.userRepository.getUserByUsername(username)
-            }
-        val player =
-            Cookie("player", playerStats.toString()).also {
-                it.path = "/"
-                it.maxAge = token.tokenExpiration.epochSeconds.toInt()
-                it.isHttpOnly = false
-            }
+        val cookie = Cookie("token", token.tokenValue).apply {
+            path = "/api"
+            maxAge = token.tokenExpiration.epochSeconds.toInt()
+            isHttpOnly = true
+        }
+        val playerStats = tm.run {
+            it.userRepository.getUserByUsername(username)
+        }
+        val player = Cookie("player", playerStats.toString()).apply {
+            path = "/"
+            maxAge = token.tokenExpiration.epochSeconds.toInt()
+            isHttpOnly = false
+        }
+
         response.addCookie(cookie)
         response.addCookie(player)
     }
 
     fun deleteCookie(response: HttpServletResponse) {
-        val cookie =
-            Cookie("token", "").also {
-                it.path = "/api"
-                it.maxAge = 0
-                it.isHttpOnly = true
-            }
-        val player =
-            Cookie("player", "").also {
-                it.path = "/"
-                it.maxAge = 0
-                it.isHttpOnly = false
-            }
+        val cookie = Cookie("token", "").apply {
+            path = "/api"
+            maxAge = 0
+            isHttpOnly = true
+        }
+        val player = Cookie("player", "").apply {
+            path = "/"
+            maxAge = 0
+            isHttpOnly = false
+        }
         response.addCookie(cookie)
         response.addCookie(player)
     }

@@ -20,7 +20,7 @@ class JdbiUserRepository(
             .mapTo<User>()
             .single()
 
-    override fun getUserById(user: Int): Boolean {
+    override fun getUserById(user: Int): User {
         return handle.createQuery(
             """
             select * from hotelhub.user where id = :user
@@ -28,7 +28,18 @@ class JdbiUserRepository(
         )
             .bind("user", user)
             .mapTo<User>()
-            .singleOrNull() != null
+            .first()
+    }
+
+    override fun userExists(id: Int): Boolean {
+        return handle.createQuery(
+            """
+                select * from hotelhub.user where id = :id
+            """.trimIndent()
+        )
+            .bind("id", id)
+            .mapTo<User>()
+            .firstOrNull() != null
     }
 
     override fun storeUser(
@@ -50,7 +61,7 @@ class JdbiUserRepository(
             .mapTo<Int>()
             .one()
 
-    override fun isUserStoredByUsername(username: String): Boolean =
+    override fun userExistsByUsername(username: String): Boolean =
         handle.createQuery("""select count(*) from hotelhub.user where username = :username""")
             .bind("username", username)
             .mapTo<Int>()
@@ -132,10 +143,22 @@ class JdbiUserRepository(
             .execute()
     }
 
+    override fun deleteAll() {
+        handle.createUpdate(
+            """
+                delete from hotelhub.token;
+                delete from hotelhub.user;
+            """.trimIndent()
+        )
+            .execute()
+    }
+
     private data class UserAndTokenModel(
         val id: Int,
         val username: String,
+        val email: String,
         val passwordValidation: PasswordValidationInfo,
+        val role: Role,
         val tokenValidation: TokenValidationInfo,
         val createdAt: Long,
         val lastUsedAt: Long,
@@ -143,7 +166,7 @@ class JdbiUserRepository(
         val userAndToken: Pair<User, Token>
             get() =
                 Pair(
-                    User(id, username, passwordValidation),
+                    User(id, username, email, passwordValidation, role),
                     Token(
                         tokenValidation,
                         id,

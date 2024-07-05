@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class JdbiTransactionManager(
-    private val jdbi: Jdbi,
+    private val jdbi: Jdbi
 ) : TransactionManager {
     override fun <R> run(block: (Transaction) -> R): R =
         jdbi.inTransaction<R, Exception> { handle ->

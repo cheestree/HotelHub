@@ -16,6 +16,10 @@ class JdbiTransaction(
     override val hotelRepository: HotelRepository = JdbiHotelRepository(handle)
     override val critiqueRepository: CritiqueRepository = JdbiCritiqueRepository(handle)
 
+    override fun commit() {
+        handle.commit()
+    }
+
     override fun rollback() {
         handle.rollback()
     }

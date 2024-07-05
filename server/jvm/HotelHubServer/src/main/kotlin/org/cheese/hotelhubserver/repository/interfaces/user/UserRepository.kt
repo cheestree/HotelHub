@@ -17,11 +17,13 @@ interface UserRepository {
 
     fun getUserByUsername(username: String): User
 
-    fun getUserById(user: Int): Boolean
+    fun getUserById(user: Int): User
+
+    fun userExists(id: Int): Boolean
 
     fun getTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>?
 
-    fun isUserStoredByUsername(username: String): Boolean
+    fun userExistsByUsername(username: String): Boolean
 
     fun createToken(
         token: Token,
@@ -34,4 +36,6 @@ interface UserRepository {
     )
 
     fun removeTokenByValidationInfo(tokenValidationInfo: TokenValidationInfo): Int
+
+    fun deleteAll()
 }

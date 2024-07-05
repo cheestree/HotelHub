@@ -1,15 +1,11 @@
 package org.cheese.hotelhubserver.http.controller
 
 import jakarta.servlet.http.HttpServletResponse
-import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotEmpty
 import org.cheese.hotelhubserver.domain.user.AuthenticatedUser
 import org.cheese.hotelhubserver.http.Uris
-import org.cheese.hotelhubserver.http.model.user.OrderedChecks
-import org.cheese.hotelhubserver.http.model.user.UserCreateInputModel
-import org.cheese.hotelhubserver.http.model.user.UserCreateTokenInputModel
-import org.cheese.hotelhubserver.http.model.user.UserHomeOutputModel
+import org.cheese.hotelhubserver.http.model.user.*
 import org.cheese.hotelhubserver.services.UserServices
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
@@ -43,16 +39,17 @@ class UserController(
     fun logout(
         user: AuthenticatedUser,
         response: HttpServletResponse,
-    ) {
-        userServices.deleteCookie(response)
-        userServices.revokeToken(user.token)
+    ): ResponseEntity<*> {
+        userServices.logout(response, user)
+        return ResponseEntity.ok("success")
     }
 
     @GetMapping(Uris.User.GET_BY_ID)
     fun getById(
         @Validated @NotEmpty @Min(value = 1, message = "Must be at least 1") @PathVariable id: String,
-    ) {
-        TODO("TODO")
+    ): ResponseEntity<*>  {
+        val res = userServices.getUserById(id.toInt())
+        return ResponseEntity.ok().body(UserFetchOutputModel(res.id, res.username, res.email, res.role.toString()))
     }
 
     @GetMapping(Uris.User.HOME)

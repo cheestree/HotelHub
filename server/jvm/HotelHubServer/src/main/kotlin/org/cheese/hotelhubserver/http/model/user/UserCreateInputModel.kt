@@ -8,7 +8,7 @@ import jakarta.validation.groups.Default
 import org.cheese.hotelhubserver.domain.user.Role
 import org.cheese.hotelhubserver.domain.user.RoleDeserializer
 
-const val USERNAME_MIN_LENGTH = 8
+const val USERNAME_MIN_LENGTH = 4
 const val USERNAME_MAX_LENGTH = 20
 const val PASSWORD_MIN_LENGTH = 6
 

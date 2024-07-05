@@ -9,6 +9,7 @@ interface Transaction {
     val hotelRepository: HotelRepository
     val critiqueRepository: CritiqueRepository
 
-    // other repository types
+    fun commit()
+
     fun rollback()
 }
