@@ -11,7 +11,7 @@ interface HotelRepository {
         latitude: Double,
         longitude: Double,
         features: List<Int>? = null,
-    ): Boolean
+    ): Int
 
     fun getHotel(id: Int): Hotel
 

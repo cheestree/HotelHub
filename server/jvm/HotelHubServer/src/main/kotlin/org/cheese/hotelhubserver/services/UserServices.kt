@@ -13,6 +13,8 @@ import org.cheese.hotelhubserver.domain.user.token.TokenExternalInfo
 import org.cheese.hotelhubserver.repository.interfaces.TransactionManager
 import org.cheese.hotelhubserver.util.requireOrThrow
 import org.springframework.stereotype.Component
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @Component
 class UserServices(
@@ -116,17 +118,19 @@ class UserServices(
             maxAge = token.tokenExpiration.epochSeconds.toInt()
             isHttpOnly = true
         }
+        /*
         val playerStats = tm.run {
-            it.userRepository.getUserByUsername(username)
+            domain.toUserDetails(it.userRepository.getUserByUsername(username))
         }
-        val player = Cookie("player", playerStats.toString()).apply {
+        val encodedPlayerStats = URLEncoder.encode(playerStats, StandardCharsets.UTF_8.toString())
+        val player = Cookie("player", encodedPlayerStats).apply {
             path = "/"
             maxAge = token.tokenExpiration.epochSeconds.toInt()
             isHttpOnly = false
         }
-
+        */
         response.addCookie(cookie)
-        response.addCookie(player)
+        //  response.addCookie(player)
     }
 
     fun deleteCookie(response: HttpServletResponse) {
@@ -134,13 +138,17 @@ class UserServices(
             path = "/api"
             maxAge = 0
             isHttpOnly = true
+            secure = true
         }
+        /*
         val player = Cookie("player", "").apply {
             path = "/"
             maxAge = 0
             isHttpOnly = false
+            secure = true
         }
+        */
         response.addCookie(cookie)
-        response.addCookie(player)
+        //  response.addCookie(player)
     }
 }

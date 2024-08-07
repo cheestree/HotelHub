@@ -11,11 +11,11 @@ export const login = async (username: string, password: string) => {
 	await goto(req.ok ? "/home" : "/login")
 }
 
-export const register = async (username: string, password: string, email: string) => {
+export const register = async (username: string, password: string, email: string, role: string) => {
 	await fetch('/api/user', {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		credentials: "include",
-		body: JSON.stringify({"username": username, "password": password, "email": email})
+		body: JSON.stringify({"username": username, "password": password, "email": email, "role": role})
 	})
 }

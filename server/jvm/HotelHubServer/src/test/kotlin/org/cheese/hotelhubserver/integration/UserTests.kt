@@ -107,12 +107,12 @@ class UserTests {
 
 
             val tokenCookie = loginResult.response.getCookie("token")
-            val playerCookie = loginResult.response.getCookie("player")
+            //  val playerCookie = loginResult.response.getCookie("player")
 
             assertNotNull(tokenCookie)
             assertEquals("token", tokenCookie!!.name)
-            assertNotNull(playerCookie)
-            assertEquals("player", playerCookie!!.name)
+            //  assertNotNull(playerCookie)
+            //  assertEquals("player", playerCookie!!.name)
         }
     }
 

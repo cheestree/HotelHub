@@ -16,7 +16,7 @@ class JdbiHotelRepository(
         latitude: Double,
         longitude: Double,
         features: List<Int>?,
-    ): Boolean {
+    ): Int {
         return handle.createUpdate(
             """
                 insert into hotelhub.hotel (name, address, stars, latitude, longitude) values (:name, :address, :stars, :latitude, :longitude);
@@ -27,7 +27,10 @@ class JdbiHotelRepository(
             .bind("stars", stars)
             .bind("latitude", latitude)
             .bind("longitude", longitude)
-            .execute() == 1
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Hotel>()
+            .first()
+            .id
     }
 
     override fun getHotel(id: Int): Hotel {

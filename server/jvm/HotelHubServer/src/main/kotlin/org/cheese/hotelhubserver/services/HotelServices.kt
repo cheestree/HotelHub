@@ -2,8 +2,10 @@ package org.cheese.hotelhubserver.services
 
 import kotlinx.datetime.Clock
 import org.cheese.hotelhubserver.domain.exceptions.HotelExceptions.HotelDoesntExist
+import org.cheese.hotelhubserver.domain.exceptions.UserExceptions.InvalidRole
 import org.cheese.hotelhubserver.domain.hotel.Hotel
 import org.cheese.hotelhubserver.domain.hotel.HotelDomain
+import org.cheese.hotelhubserver.domain.user.Role
 import org.cheese.hotelhubserver.http.model.hotel.HotelOutputModel
 import org.cheese.hotelhubserver.repository.interfaces.TransactionManager
 import org.cheese.hotelhubserver.util.requireOrThrow
@@ -21,11 +23,13 @@ class HotelServices(
         stars: Int,
         latitude: Double,
         longitude: Double,
-    ): Boolean =
-        tm.run {
-            //  TODO: Add parameter checking via domain here
+        role: Role
+    ): Int {
+        requireOrThrow<InvalidRole>(role == Role.OWNER) { "You need to be an owner to create a hotel" }
+        return tm.run {
             it.hotelRepository.createHotel(name, address, stars, latitude, longitude)
         }
+    }
 
     fun getHotel(id: Int): Hotel =
         tm.run {

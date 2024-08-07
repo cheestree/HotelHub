@@ -16,6 +16,10 @@ class UserDomain(
     private val tokenEncoder: TokenEncoder,
     private val config: UserDomainConfig,
 ) {
+    fun toUserDetails(user: User): String {
+        return "id: ${user.id}, " + "username: ${user.username}, " + "email: ${user.email}, " + "role: ${user.role}"
+    }
+
     fun generateTokenValue(): String =
         ByteArray(config.tokenSizeInBytes).let { byteArray ->
             SecureRandom.getInstanceStrong().nextBytes(byteArray)
