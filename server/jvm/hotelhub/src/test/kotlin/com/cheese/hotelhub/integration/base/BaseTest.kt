@@ -34,6 +34,7 @@ abstract class BaseTest {
         USERS.forEach { userRepository.save(it) }
         HOTELS.forEach { hotelRepository.save(it) }
         REVIEWS.forEach { reviewRepository.save(it) }
+        userRepository.save(COMMENTER)
         userRepository.save(OWNER)
         userRepository.save(ADMIN)
     }
@@ -42,9 +43,9 @@ abstract class BaseTest {
         val USERS = listOf(
             User(id = 1L, oauthId = "1", name = "Test User 1", email = "testuser1@example.com", role = Role.MEMBER),
             User(id = 2L, oauthId = "2", name = "Test User 2", email = "testuser2@example.com", role = Role.MEMBER),
-            User(id = 3L, oauthId = "3", name = "Test User 3", email = "testuser3@example.com", role = Role.MEMBER),
         )
 
+        val COMMENTER = User(id = 3L, oauthId = "3", name = "Test User 3", email = "testuser3@example.com", role = Role.MEMBER)
         val OWNER = User(id = 4L, oauthId = "4", name = "Test User 4", email = "testuser4@example.com", role = Role.OWNER)
         val ADMIN = User(id = 5L, oauthId = "5", name = "Test User 5", email = "testuser5@example.com", role = Role.ADMIN)
 
