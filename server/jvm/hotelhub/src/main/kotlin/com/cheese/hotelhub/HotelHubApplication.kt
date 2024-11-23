@@ -1,6 +1,8 @@
 package com.cheese.hotelhub
 
 import com.cheese.hotelhub.interceptor.Interceptor
+import com.cheese.hotelhub.interceptor.OAuth2SuccessHandler
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
@@ -19,6 +21,8 @@ class HotelHubApplication
 class WebConfig(
 	private val interceptors: Interceptor,
 ) : WebMvcConfigurer {
+	@Autowired
+	lateinit var oAuth2SuccessHandler: OAuth2SuccessHandler
 
 	@Bean
 	fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -30,6 +34,7 @@ class WebConfig(
 				oauth2Login
 					.loginPage("/login") //	Custom login page
 					.defaultSuccessUrl("/home", true) // Redirect after login
+					.successHandler(oAuth2SuccessHandler)
 			}
 			.logout { logout ->
 				logout

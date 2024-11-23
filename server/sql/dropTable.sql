@@ -1,7 +1,3 @@
-drop table hotelhub.critique;
-drop table hotelhub.hotel_features;
-drop table hotelhub.features;
-drop table hotelhub.hotel;
-drop table hotelhub.token;
-drop table hotelhub.user;
-drop schema hotelhub;
+drop table reviews;
+drop table hotels;
+drop table users;

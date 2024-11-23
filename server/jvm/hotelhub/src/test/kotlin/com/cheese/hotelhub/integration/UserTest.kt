@@ -1,14 +1,16 @@
 package com.cheese.hotelhub.integration
 
 import com.cheese.hotelhub.domain.error.Error
+import com.cheese.hotelhub.domain.path.ApiPaths
+import com.cheese.hotelhub.domain.path.ApiPaths.REVIEW
+import com.cheese.hotelhub.domain.path.ApiPaths.Reviews.GET_REVIEW
+import com.cheese.hotelhub.domain.path.ApiPaths.URL
+import com.cheese.hotelhub.domain.path.ApiPaths.USER
+import com.cheese.hotelhub.domain.path.ApiPaths.Users.GET_USER
 import com.cheese.hotelhub.domain.user.User
 import com.cheese.hotelhub.integration.base.BaseTest
-import com.cheese.hotelhub.repository.user.UserRepository
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
 import kotlin.test.Test
@@ -20,15 +22,10 @@ class UserTest : BaseTest() {
     @LocalServerPort
     private var port: Int = 0
 
-    @Autowired
-    private lateinit var restTemplate: TestRestTemplate
-
-    @Autowired
-    lateinit var objectMapper: ObjectMapper
-
     @Test
     fun `should return Success user profile`() {
-        val response = restTemplate.getForEntity("http://localhost:$port/users/1", String::class.java)
+        val path = ApiPaths.resolvePath(URL + USER + GET_USER, mapOf("port" to "$port", "userId" to "1"))
+        val response = createGET(path)
 
         assertEquals(HttpStatus.OK, response.statusCode)
 
@@ -39,7 +36,8 @@ class UserTest : BaseTest() {
 
     @Test
     fun `should return NotFound user profile`() {
-        val response = restTemplate.getForEntity("http://localhost:$port/users/999", String::class.java)
+        val path = ApiPaths.resolvePath(URL + USER + GET_USER, mapOf("port" to "$port", "userId" to "999"))
+        val response = createGET(path)
 
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
 

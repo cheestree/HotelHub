@@ -3,6 +3,14 @@ package com.cheese.hotelhub.integration
 import com.cheese.hotelhub.domain.error.Error
 import com.cheese.hotelhub.domain.hotel.Hotel
 import com.cheese.hotelhub.domain.model.input.HotelInputModel
+import com.cheese.hotelhub.domain.path.ApiPaths
+import com.cheese.hotelhub.domain.path.ApiPaths.HOTEL
+import com.cheese.hotelhub.domain.path.ApiPaths.Hotel.DELETE_HOTEL
+import com.cheese.hotelhub.domain.path.ApiPaths.Hotel.GET_HOTEL
+import com.cheese.hotelhub.domain.path.ApiPaths.Hotel.POST_HOTEL
+import com.cheese.hotelhub.domain.path.ApiPaths.REVIEW
+import com.cheese.hotelhub.domain.path.ApiPaths.Reviews.GET_REVIEW
+import com.cheese.hotelhub.domain.path.ApiPaths.URL
 import com.cheese.hotelhub.integration.base.BaseTest
 import com.cheese.hotelhub.integration.base.Config
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -26,15 +34,10 @@ class HotelTest : BaseTest() {
     @LocalServerPort
     private var port: Int = 0
 
-    @Autowired
-    private lateinit var restTemplate: TestRestTemplate
-
-    @Autowired
-    lateinit var objectMapper: ObjectMapper
-
     @Test
     fun `should return NotFound hotel not found`() {
-        val response = restTemplate.getForEntity("http://localhost:$port/hotels/999", String::class.java)
+        val getHotelPath = ApiPaths.resolvePath(URL + HOTEL + GET_HOTEL, mapOf("port" to "$port", "hotelId" to "999"))
+        val response = createGET(getHotelPath)
 
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
 
@@ -45,7 +48,8 @@ class HotelTest : BaseTest() {
 
     @Test
     fun `should return OK hotel found`() {
-        val response = restTemplate.getForEntity("http://localhost:$port/hotels/1", String::class.java)
+        val getHotelPath = ApiPaths.resolvePath(URL + HOTEL + GET_HOTEL, mapOf("port" to "$port", "hotelId" to "1"))
+        val response = createGET(getHotelPath)
 
         assertEquals(HttpStatus.OK, response.statusCode)
 
@@ -67,18 +71,29 @@ class HotelTest : BaseTest() {
         )
         val entity = HttpEntity(body, headers)
 
-        val response = restTemplate.exchange(
-            "http://localhost:$port/hotels",
-            HttpMethod.POST,
-            entity,
-            String::class.java
-        )
+        val createHotelPath = ApiPaths.resolvePath(URL + HOTEL + POST_HOTEL, mapOf("port" to "$port"))
+        val response = createPOST(createHotelPath, entity)
 
         assertEquals(HttpStatus.OK, response.statusCode)
 
         val actualHotel = objectMapper.readValue(response.body, Hotel::class.java)
 
         assertNotNull(actualHotel)
+    }
+
+    @Test
+    fun `should return NotFound when trying to delete hotel`() {
+        val headers = createHeaders(ADMIN)
+        val entity = HttpEntity("", headers)
+
+        val deleteHotelPath = ApiPaths.resolvePath(URL + HOTEL + DELETE_HOTEL, mapOf("port" to "$port", "hotelId" to "999"))
+        val deleteResponse = createDELETE(deleteHotelPath, entity)
+
+        assertEquals(HttpStatus.NOT_FOUND, deleteResponse.statusCode)
+
+        val actualUserResponse = objectMapper.readValue(deleteResponse.body, Error::class.java)
+
+        assertEquals(HttpStatus.NOT_FOUND, actualUserResponse.status)
     }
 
     @Test
@@ -93,12 +108,8 @@ class HotelTest : BaseTest() {
         )
         val entity = HttpEntity(body, headers)
 
-        val createResponse = restTemplate.exchange(
-            "http://localhost:$port/hotels",
-            HttpMethod.POST,
-            entity,
-            String::class.java
-        )
+        val createHotelPath = ApiPaths.resolvePath(URL + HOTEL + POST_HOTEL, mapOf("port" to "$port"))
+        val createResponse = createPOST(createHotelPath, entity)
 
         assertEquals(HttpStatus.OK, createResponse.statusCode)
 
@@ -106,12 +117,8 @@ class HotelTest : BaseTest() {
 
         assertNotNull(actualHotel)
 
-        val deleteResponse = restTemplate.exchange(
-            "http://localhost:$port/hotels/"+actualHotel.id,
-            HttpMethod.DELETE,
-            entity,
-            String::class.java
-        )
+        val deleteHotelPath = ApiPaths.resolvePath(URL + HOTEL + DELETE_HOTEL, mapOf("port" to "$port", "hotelId" to "${actualHotel.id}"))
+        val deleteResponse = createDELETE(deleteHotelPath, entity)
 
         assertEquals(HttpStatus.OK, createResponse.statusCode)
 

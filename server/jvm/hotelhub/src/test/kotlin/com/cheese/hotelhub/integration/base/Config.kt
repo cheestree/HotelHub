@@ -41,8 +41,8 @@ class Config(
         val converter = JwtAuthenticationConverter()
 
         converter.setJwtGrantedAuthoritiesConverter { jwt ->
-            val userId = jwt.claims["sub"] as String
-            listOf(SimpleGrantedAuthority(userId))
+            val role = jwt.claims["role"] as String
+            listOf(SimpleGrantedAuthority("ROLE_$role"))
         }
 
         return converter

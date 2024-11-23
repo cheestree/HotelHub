@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$USER_HOME$/Desktop/JavaApp1-eclipse/resources/create.sql" dialect="MySQL" />
-    <file url="file://$USER_HOME$/Desktop/JavaApp1-eclipse/resources/drop.sql" dialect="MySQL" />
-    <file url="file://$USER_HOME$/Desktop/JavaApp1-eclipse/resources/insert.sql" dialect="MySQL" />
-    <file url="file://$USER_HOME$/Desktop/JavaApp1-eclipse/resources/procedures.sql" dialect="MySQL" />
-    <file url="file://$USER_HOME$/Desktop/JavaApp1-eclipse/resources/select.sql" dialect="MySQL" />
-    <file url="file://$USER_HOME$/Desktop/JavaApp1-eclipse/resources/triggers.sql" dialect="MySQL" />
-    <file url="file://$USER_HOME$/Desktop/JavaApp1-eclipse/resources/view.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/../../../../Isel/ANO3/ls/2324-2-LEIC42D-G10/src/main/sql/createTables.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/../../../../Isel/ANO3/ls/2324-2-LEIC42D-G10/src/main/sql/insertData.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/createTable.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/dropTable.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/../../../SinkIt/sql/createTable.sql" dialect="PostgreSQL" />
     <file url="PROJECT" dialect="MySQL" />
   </component>

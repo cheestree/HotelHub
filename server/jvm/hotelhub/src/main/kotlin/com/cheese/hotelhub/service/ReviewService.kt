@@ -16,15 +16,11 @@ class ReviewService(
     private val hotelRepository: HotelRepository
 ) {
     fun createReview(hotelId: Long, userId: Long, content: String, rating: Int): Review {
-        val user = userRepository.findById(userId).orElseThrow {
-            ResourceNotFoundException("User with ID $userId not found")
-        }
-
         val hotel = hotelRepository.findById(hotelId).orElseThrow {
             ResourceNotFoundException("Hotel with ID $hotelId not found")
         }
 
-        val reviewKey = ReviewKey(userId = user.id, hotelId = hotel.id)
+        val reviewKey = ReviewKey(userId = userId, hotelId = hotel.id)
         val review = Review(id = reviewKey, text = content, rating = rating)
 
         return reviewRepository.save(review)
@@ -39,11 +35,7 @@ class ReviewService(
             throw ResourceNotFoundException("Review not found for user $userId and hotel $hotelId")
         }
 
-        if(review.id.userId != userId) {
-            throw UnauthorizedAccessException("User $userId is not the author of this review")
-        }
-
-        reviewRepository.deleteById(ReviewKey(userId, hotelId))
+        reviewRepository.delete(review)
 
         return true
     }

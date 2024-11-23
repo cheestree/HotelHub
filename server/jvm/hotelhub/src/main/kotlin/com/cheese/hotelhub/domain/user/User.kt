@@ -1,5 +1,6 @@
 package com.cheese.hotelhub.domain.user
 
+import com.cheese.hotelhub.domain.enums.AuthProvider
 import com.cheese.hotelhub.domain.enums.Role
 import jakarta.persistence.*
 
@@ -10,8 +11,12 @@ data class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0, // Auto-incremented primary key
 
-    @Column(unique = true)
-    val oauthId: String,
+    @Column(nullable = true, unique = true)
+    val oauthId: String? = null,
+    val authProvider: AuthProvider,
+
+    @Column(nullable = true)
+    val hash: String? = null,
 
     val name: String,
     val email: String,

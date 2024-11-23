@@ -3,14 +3,12 @@ package com.cheese.hotelhub.service
 import com.cheese.hotelhub.domain.exception.HotelHubException.ResourceNotFoundException
 import com.cheese.hotelhub.domain.hotel.Hotel
 import com.cheese.hotelhub.repository.hotel.HotelRepository
-import com.cheese.hotelhub.repository.review.ReviewRepository
 import com.cheese.hotelhub.repository.user.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
 class HotelService(
-    private val reviewRepository: ReviewRepository,
     private val hotelRepository: HotelRepository,
     private val userRepository: UserRepository
 ) {
